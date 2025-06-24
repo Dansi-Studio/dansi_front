@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 export default function Home() {
@@ -80,13 +79,13 @@ export default function Home() {
           opacity: logoLoaded ? 1 : 0.8
         }}
       >
-        <Image
+        <img
           src="/logo.png"
           alt="단시 공방 로고"
           width={250}
           height={175}
           className="object-contain"
-          priority
+          style={{ maxWidth: '100%', height: 'auto' }}
         />
       </div>
 
@@ -118,12 +117,13 @@ export default function Home() {
             e.currentTarget.style.filter = 'drop-shadow(0 0 0 transparent)';
           }}
         >
-          <Image
+          <img
             src="/login/kakao.png"
             alt="카카오 로그인"
             width={450}
             height={60}
             className="object-contain w-full h-auto"
+            style={{ maxWidth: '100%', height: 'auto' }}
           />
         </div>
 
