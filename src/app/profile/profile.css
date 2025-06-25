@@ -1,0 +1,122 @@
+.profile-container {
+  min-height: 100vh;
+  background-color: #FDFCFC;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+
+.profile-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.profile-image {
+  margin-bottom: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(115, 80, 48, 0.1);
+}
+
+.profile-image img {
+  border-radius: 50%;
+}
+
+.profile-nickname {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2E2014;
+  margin: 0 0 12px 0;
+  font-family: 'Sunflower', cursive;
+}
+
+.profile-bio {
+  font-size: 16px;
+  color: #735030;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+  max-width: 280px;
+  font-family: 'Sunflower', cursive;
+  font-weight: 300;
+}
+
+.profile-join-date {
+  font-size: 14px;
+  color: #735030;
+  margin-bottom: 32px;
+  opacity: 0.8;
+  font-family: 'Sunflower', cursive;
+  font-weight: 300;
+}
+
+.logout-button {
+  background-color: #735030;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: 'Sunflower', cursive;
+}
+
+.logout-button:hover {
+  background-color: #2E2014;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .profile-header {
+    padding: 30px 16px 20px 16px;
+  }
+  
+  .profile-info {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .profile-nickname {
+    font-size: 20px;
+  }
+  
+  .profile-bio {
+    font-size: 13px;
+  }
+  
+  .profile-stats {
+    gap: 24px;
+    padding: 16px 0;
+  }
+  
+  .stat-number {
+    font-size: 20px;
+  }
+  
+  .profile-content {
+    padding: 16px;
+  }
+  
+  .writing-card {
+    padding: 16px;
+  }
+  
+  .writing-title {
+    font-size: 16px;
+  }
+  
+  .settings-group {
+    padding: 20px;
+  }
+} 

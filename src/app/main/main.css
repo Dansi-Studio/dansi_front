@@ -1,0 +1,150 @@
+.main-container {
+  min-height: 100vh;
+  background-color: #FDFCFC;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sunflower), sans-serif;
+  position: relative;
+}
+
+/* 헤더 - 로고 */
+.main-header {
+  padding: 40px 20px 20px 20px;
+  text-align: center;
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-logo {
+  object-fit: contain;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 100px;
+}
+
+.keyword-section {
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  padding: 12px 0px;
+}
+
+.today-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.today-text {
+  font-size: 20px;
+  font-weight: 300;
+  color: #735030;
+  letter-spacing: 1px;
+}
+
+.keyword-line {
+  position: relative;
+  display: inline-block;
+  margin: 20px 0;
+}
+
+.keyword-text {
+  font-size: 56px;
+  font-weight: 700;
+  color: #735030;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+}
+
+.keyword-text::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #735030;
+}
+
+.write-line {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.write-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #735030;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.write-text:hover {
+  color: #2E2014;
+}
+
+
+
+/* 애니메이션 */
+.keyword-text {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .main-header {
+    padding: 30px 16px 16px 16px;
+  }
+  
+  .main-logo {
+    width: 100px;
+    height: 70px;
+  }
+  
+  .today-text {
+    font-size: 18px;
+  }
+  
+  .keyword-text {
+    font-size: 48px;
+  }
+  
+  .write-text {
+    font-size: 14px;
+  }
+  
+  .main-content {
+    padding: 16px;
+    margin-bottom: 80px;
+  }
+  
+
+} 

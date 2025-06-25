@@ -10,14 +10,33 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-noto-sans-kr);
+  --font-sans: var(--font-sunflower);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-noto-sans-kr), Arial, sans-serif;
+  font-family: var(--font-sunflower), Arial, sans-serif;
   line-height: 1.6;
+}
+
+/* Sunflower 폰트 클래스들 */
+.sunflower-light {
+  font-family: "Sunflower", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.sunflower-medium {
+  font-family: "Sunflower", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.sunflower-bold {
+  font-family: "Sunflower", sans-serif;
+  font-weight: 700;
+  font-style: normal;
 }
 
 /* 스크롤바 숨기기 */

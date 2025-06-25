@@ -1,0 +1,165 @@
+/* 홈 페이지 스타일 */
+
+.home-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #F3EFEC;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8vh;
+  margin-bottom: 24vh;
+  transition: all 1000ms ease-out;
+}
+
+.logo-container.loaded {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.logo-container.loading {
+  transform: scale(1.5);
+  opacity: 0.8;
+}
+
+.logo-image {
+  object-fit: contain;
+  max-width: 100%;
+  height: auto;
+}
+
+.buttons-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1vh;
+}
+
+.kakao-login {
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  width: 80%;
+  max-width: 450px;
+  min-width: 280px;
+  filter: drop-shadow(0 0 0 transparent);
+  transition-property: filter;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+.kakao-login.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition-property: opacity, transform, filter;
+  transition-duration: 0.6s, 0.6s, 0.2s;
+  transition-timing-function: ease-out, ease-out, ease;
+  transition-delay: 0.2s, 0.2s, 0s;
+}
+
+.kakao-login.hide {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+
+.kakao-login:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  filter: drop-shadow(0 4px 12px rgba(254, 229, 0, 0.3));
+}
+
+.kakao-image {
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.google-login {
+  width: 80%;
+  max-width: 450px;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background-color: white;
+  color: #666666;
+  border: 1px solid #DADCE0;
+  font-weight: 500;
+  font-size: clamp(14px, 2.5vw, 16px);
+  gap: clamp(8px, 1.5vw, 12px);
+  padding: 0 clamp(20px, 4vw, 32px);
+  box-sizing: border-box;
+  transition-property: background-color, box-shadow;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease, ease;
+}
+
+.google-login.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition-property: opacity, transform, background-color, box-shadow;
+  transition-duration: 0.6s, 0.6s, 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out, ease, ease;
+  transition-delay: 0.4s, 0.4s, 0s, 0s;
+}
+
+.google-login.hide {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+
+.google-login:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.together-button {
+  width: 80%;
+  max-width: 450px;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background-color: #8B6F47;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: clamp(14px, 2.5vw, 16px);
+  padding: 0 clamp(20px, 4vw, 32px);
+  box-sizing: border-box;
+  transition-property: background-color, box-shadow;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease, ease;
+}
+
+.together-button.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition-property: opacity, transform, background-color, box-shadow;
+  transition-duration: 0.6s, 0.6s, 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out, ease, ease;
+  transition-delay: 0.6s, 0.6s, 0s, 0s;
+}
+
+.together-button.hide {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+
+.together-button:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+} 

@@ -1,0 +1,199 @@
+.signup-container {
+  min-height: 100vh;
+  background-color: #FDFCFC;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: var(--font-sunflower), sans-serif;
+}
+
+.signup-header {
+  margin-bottom: 60px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #735030;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: var(--font-sunflower), sans-serif;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #2E2014;
+}
+
+.signup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  width: 100%;
+  margin-top: 40px;
+}
+
+.signup-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2E2014;
+  margin-bottom: 40px;
+  text-align: center;
+  font-family: var(--font-sunflower), sans-serif;
+}
+
+.signup-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  width: 100%;
+  position: relative;
+}
+
+.email-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.signup-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 12px;
+  background-color: rgba(115, 80, 48, 0.09);
+  font-size: 16px;
+  font-family: var(--font-sunflower), sans-serif;
+  color: #2E2014;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.email-input {
+  flex: 1;
+}
+
+.signup-input::placeholder {
+  color: #735030;
+  opacity: 0.7;
+}
+
+.signup-input:focus {
+  outline: none;
+  background-color: rgba(115, 80, 48, 0.15);
+  transform: translateY(-1px);
+}
+
+.verify-button {
+  background-color: #735030;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-sunflower), sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.verify-button:hover:not(:disabled) {
+  background-color: #2E2014;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(115, 80, 48, 0.3);
+}
+
+.verify-button.verified {
+  background-color: #4CAF50;
+  cursor: default;
+}
+
+.verify-button:disabled {
+  opacity: 0.8;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.confirm-button {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background-color: #735030;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-sunflower), sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-button:hover {
+  background-color: #2E2014;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(115, 80, 48, 0.3);
+}
+
+.cancel-button {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background-color: rgba(115, 80, 48, 0.09);
+  color: #735030;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-sunflower), sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover {
+  background-color: rgba(115, 80, 48, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(115, 80, 48, 0.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 16px;
+  }
+  
+  .signup-title {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .signup-input {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .verify-button {
+    padding: 14px 16px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+  
+  .confirm-button,
+  .cancel-button {
+    padding: 14px;
+    font-size: 14px;
+  }
+} 
