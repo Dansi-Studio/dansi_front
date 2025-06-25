@@ -11,14 +11,40 @@ const keywords = [
 ]
 
 export default function MainPage() {
-  const [currentKeyword, setCurrentKeyword] = useState('별')
+  const [currentKeyword, setCurrentKeyword] = useState(() => {
+    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+    return randomKeyword;
+  })
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [isChanging, setIsChanging] = useState(false)
+
+  // 초기 애니메이션 시작
+  useEffect(() => {
+    // 컴포넌트 마운트 시 애니메이션 시작
+    const timer = setTimeout(() => {
+      setIsLoaded(true)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   // 키워드 동적 변경 (예시)
   useEffect(() => {
     const interval = setInterval(() => {
-      const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)]
-      setCurrentKeyword(randomKeyword)
-    }, 3000) // 5초마다 변경
+      // 키워드 변경 애니메이션 시작
+      setIsChanging(true)
+      
+      setTimeout(() => {
+        const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)]
+        setCurrentKeyword(randomKeyword)
+        
+        // 새 키워드 설정 후 애니메이션 완료
+        setTimeout(() => {
+          setIsChanging(false)
+        }, 50)
+      }, 300) // 기존 키워드가 사라지는 시간
+      
+    }, 3000) // 3초마다 변경
 
     return () => clearInterval(interval)
   }, [])
@@ -56,11 +82,11 @@ export default function MainPage() {
 
       {/* 메인 콘텐츠 */}
       <div className="main-content">
-        <div className="keyword-section">
+        <div className={`keyword-section ${isLoaded ? 'loaded' : ''}`}>
           <div className="today-line">
             <span className="today-text">오늘의</span>
           </div>
-          <div className="keyword-line">
+          <div className={`keyword-line ${isChanging ? 'changing' : ''}`}>
             <span className="keyword-text">{formatKeyword(currentKeyword)}</span>
           </div>
           <div className="write-line">

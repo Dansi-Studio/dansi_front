@@ -45,6 +45,10 @@
   top: 0;
   left: 0;
   z-index: 2;
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
 }
 
 .today-text {
@@ -58,6 +62,9 @@
   position: relative;
   display: inline-block;
   margin: 20px 0;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
 }
 
 .keyword-text {
@@ -68,6 +75,7 @@
   position: relative;
   display: inline-block;
   white-space: pre;
+  transition: all 0.3s ease;
 }
 
 .keyword-text::after {
@@ -78,6 +86,9 @@
   right: 0;
   height: 4px;
   background-color: #735030;
+  transform: scaleX(1);
+  transform-origin: center;
+  transition: transform 0.3s ease;
 }
 
 .write-line {
@@ -85,6 +96,10 @@
   bottom: 0;
   right: 0;
   z-index: 2;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
+  white-space: nowrap;
 }
 
 .write-text {
@@ -102,19 +117,64 @@
 
 
 
-/* 애니메이션 */
-.keyword-text {
-  animation: fadeIn 0.5s ease-in-out;
+/* 순차적 애니메이션 */
+.keyword-section.loaded .today-line {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
+.keyword-section.loaded .keyword-line {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.keyword-section.loaded .write-line {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 키워드 변경 애니메이션 */
+.keyword-line.changing .keyword-text {
+  animation: keywordFadeOut 0.3s ease-in-out forwards;
+}
+
+.keyword-line:not(.changing) .keyword-text {
+  animation: keywordFadeIn 0.4s ease-out;
+}
+
+.keyword-line.changing .keyword-text::after {
+  transform: scaleX(0);
+  transition: transform 0.2s ease-out;
+}
+
+.keyword-line:not(.changing) .keyword-text::after {
+  transform: scaleX(1);
+  transition: transform 0.3s ease-out 0.1s;
+}
+
+@keyframes keywordFadeOut {
+  0% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes keywordFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  60% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -146,5 +206,16 @@
     margin-bottom: 80px;
   }
   
-
+  /* 모바일에서 애니메이션 거리 줄이기 */
+  .today-line {
+    transform: translateX(-50px);
+  }
+  
+  .keyword-line {
+    transform: translateY(30px);
+  }
+  
+  .write-line {
+    transform: translateX(50px);
+  }
 } 
