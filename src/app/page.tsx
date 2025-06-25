@@ -107,7 +107,7 @@ export default function Home() {
           className={`google-login ${showButtons ? 'show' : 'hide'}`}
         >
           <Image
-            src="/login/google.svg"
+            src="/login/google.png"
             alt="구글 로그인"
             width={450}
             height={60}
@@ -122,7 +122,7 @@ export default function Home() {
           className={`together-button ${showButtons ? 'show' : 'hide'}`}
         >
           <Image
-            src="/login/together.svg"
+            src="/login/together.png"
             alt="함께하기"
             width={450}
             height={60}
