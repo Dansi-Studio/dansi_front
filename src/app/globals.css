@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+/* 모바일 앱처럼 고정된 화면 설정 */
+html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+/* 확대/축소 및 스크롤 방지 */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+/* 스크롤 가능한 영역에만 스크롤 허용 */
+.scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+/* 텍스트 입력 요소들은 선택 가능하게 */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
+}
+
 :root {
   --background: #F3EFEC;
   --foreground: #4A4A4A;
