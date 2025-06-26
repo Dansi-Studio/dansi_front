@@ -381,8 +381,8 @@
 
 .content-textarea {
   width: 100%;
-  min-height: calc(100vh - 240px - env(safe-area-inset-bottom, 0px));
-  height: calc(100vh - 240px - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100vh - 290px - env(safe-area-inset-bottom, 0px));
+  height: calc(100vh - 290px - env(safe-area-inset-bottom, 0px));
   border: none;
   outline: none;
   font-size: 17px;
@@ -431,6 +431,8 @@
   color: rgba(115, 80, 48, 0.6);
   font-weight: 500;
   transition: all 0.3s ease;
+  margin-top: 10px;
+  text-align: right;
 }
 
 .char-count .warning {
@@ -510,8 +512,8 @@
   }
   
   .content-textarea {
-    height: calc(100vh - 200px - env(safe-area-inset-bottom, 80px)); /* 모바일에서 전체 화면 활용 */
-    min-height: calc(100vh - 200px - env(safe-area-inset-bottom, 80px));
+    height: calc(100vh - 240px - env(safe-area-inset-bottom, 80px)); /* 모바일에서 전체 화면 활용 */
+    min-height: calc(100vh - 240px - env(safe-area-inset-bottom, 80px));
     font-size: 15px;
     line-height: 1.7;
     padding-bottom: env(safe-area-inset-bottom, 80px);
@@ -562,8 +564,8 @@
   }
   
   .content-textarea {
-    height: calc(100vh - 180px - env(safe-area-inset-bottom, 80px));
-    min-height: calc(100vh - 180px - env(safe-area-inset-bottom, 80px));
+    height: calc(100vh - 220px - env(safe-area-inset-bottom, 80px));
+    min-height: calc(100vh - 220px - env(safe-area-inset-bottom, 80px));
     font-size: 14px;
     padding-bottom: env(safe-area-inset-bottom, 80px);
   }
