@@ -12,16 +12,17 @@ const keywords = [
 ]
 
 export default function MainPage() {
-  const [currentKeyword, setCurrentKeyword] = useState(() => {
-    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
-    return randomKeyword;
-  })
+  const [currentKeyword, setCurrentKeyword] = useState('영감') // 고정된 초기값
   const [isLoaded, setIsLoaded] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
   const router = useRouter()
 
-  // 초기 애니메이션 시작
+  // 초기 애니메이션 시작 및 랜덤 키워드 설정
   useEffect(() => {
+    // 클라이언트에서만 랜덤 키워드 설정
+    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+    setCurrentKeyword(randomKeyword);
+    
     // 컴포넌트 마운트 시 애니메이션 시작
     const timer = setTimeout(() => {
       setIsLoaded(true)
