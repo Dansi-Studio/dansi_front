@@ -5,6 +5,10 @@
   flex-direction: column;
   font-family: var(--font-sunflower), sans-serif;
   position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 헤더 - 로고 */
@@ -25,13 +29,13 @@
 
 /* 메인 콘텐츠 */
 .main-content {
-  flex: 1;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px 20px;
-  margin-bottom: 100px;
-  margin-top: -40px;
+  margin-top: -200px;
+  position: relative;
 }
 
 .keyword-section {
@@ -115,8 +119,6 @@
 .write-text:hover {
   color: #2E2014;
 }
-
-
 
 /* 순차적 애니메이션 */
 .keyword-section.loaded .today-line {
@@ -204,8 +206,8 @@
   
   .main-content {
     padding: 8px 16px;
-    margin-bottom: 80px;
-    margin-top: -32px;
+    height: 100vh;
+    margin-top: -140px;
   }
   
   /* 모바일에서 애니메이션 거리 줄이기 */
@@ -219,5 +221,307 @@
   
   .write-line {
     transform: translateX(50px);
+  }
+  
+  /* 모바일에서 스크롤 안내 요소 */
+  .scroll-indicator {
+    bottom: 20px;
+  }
+  
+  .scroll-text {
+    font-size: 12px;
+  }
+
+}
+
+/* 건네는 글감 섹션 */
+.inspiration-section {
+  padding: 60px 20px 120px 20px;
+  background-color: #FDFCFC;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.inspiration-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  animation: inspirationFadeIn 0.8s ease-out forwards;
+}
+
+@keyframes inspirationFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inspiration-header {
+  text-align: center;
+  margin-bottom: 50px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inspiration-header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inspiration-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #735030;
+  margin-bottom: 12px;
+  font-family: var(--font-sunflower), sans-serif;
+}
+
+.inspiration-subtitle {
+  font-size: 16px;
+  font-weight: 300;
+  color: #735030;
+  opacity: 0.8;
+  font-family: var(--font-sunflower), sans-serif;
+  margin: 0;
+}
+
+/* 핀터레스트 스타일 그리드 */
+.keywords-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-auto-flow: dense;
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px 10px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.keywords-grid.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.keyword-card {
+  background: #f5f1eb;
+  border-radius: 4px;
+  padding: 12px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  box-shadow: none;
+  opacity: 1;
+  min-height: 50px;
+}
+
+.keyword-card:hover {
+  background: #ebe7e0;
+}
+
+.keyword-card:active {
+  background: #e0dbd3;
+}
+
+/* 카드 크기 변형 - 핀터레스트 스타일 */
+.keyword-card.small {
+  grid-row: span 1;
+  min-height: 40px;
+  padding: 8px 6px;
+}
+
+.keyword-card.medium {
+  grid-row: span 2;
+  min-height: 70px;
+  padding: 12px 8px;
+}
+
+.keyword-card.large {
+  grid-row: span 3;
+  min-height: 100px;
+  grid-column: span 2;
+  padding: 16px 12px;
+}
+
+.keyword-card-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #735030;
+  text-align: center;
+  line-height: 1.3;
+  font-family: var(--font-sunflower), sans-serif;
+  word-break: keep-all;
+}
+
+.keyword-card.large .keyword-card-text {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+@keyframes keywordCardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 태블릿 반응형 */
+@media (max-width: 768px) and (min-width: 481px) {
+  .inspiration-section {
+    padding: 50px 18px 110px 18px;
+  }
+  
+  .scroll-indicator {
+    bottom: 45px;
+  }
+  
+  .scroll-text {
+    font-size: 12px;
+    margin-bottom: 7px;
+  }
+  
+  .scroll-arrow {
+    transform: scale(0.75);
+  }
+}
+
+/* 모바일 반응형 - 건네는 글감 */
+@media (max-width: 480px) {
+.inspiration-section {
+    padding: 40px 16px 100px 16px;
+  }
+  
+  .inspiration-title {
+    font-size: 28px;
+  }
+  
+  .inspiration-subtitle {
+    font-size: 14px;
+  }
+  
+  .keywords-grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 1px;
+    padding: 16px 8px;
+  }
+  
+  .keyword-card {
+    padding: 12px;
+    border-radius: 12px;
+    min-height: 50px;
+  }
+  
+  .keyword-card.medium {
+    min-height: 80px;
+  }
+  
+  .keyword-card.large {
+    min-height: 70px;
+    padding: 12px 8px;
+  }
+  
+  .keyword-card-text {
+    font-size: 14px;
+  }
+  
+  .keyword-card.large .keyword-card-text {
+    font-size: 16px;
+  }
+
+  /* 스크롤 안내 요소 모바일 반응형 */
+  .scroll-indicator {
+    bottom: 30px;
+  }
+  
+  .scroll-text {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .scroll-arrow {
+    transform: scale(0.7);
+  }
+}
+
+/* 스크롤 안내 요소 */
+.scroll-indicator {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.scroll-indicator.visible {
+  opacity: 1;
+  visibility: visible;
+  animation: scrollIndicatorPulse 2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.scroll-text {
+  font-size: 16px;
+  font-weight: 400;
+  color: #735030;
+  margin-bottom: 10px;
+  font-family: var(--font-sunflower), sans-serif;
+  opacity: 0.8;
+}
+
+.scroll-arrow {
+  color: #735030;
+  opacity: 0.7;
+  animation: scrollArrowBounce 1.5s ease-in-out infinite;
+  transform: scale(0.9);
+}
+
+.scroll-indicator:hover .scroll-text {
+  opacity: 1;
+  color: #2E2014;
+}
+
+.scroll-indicator:hover .scroll-arrow {
+  opacity: 1;
+  color: #2E2014;
+}
+
+@keyframes scrollIndicatorPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes scrollArrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
   }
 } 
