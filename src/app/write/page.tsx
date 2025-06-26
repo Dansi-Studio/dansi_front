@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import './write.css'
 
-export default function WritePage() {
+function WritePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const titleRef = useRef<HTMLInputElement>(null)
@@ -141,4 +141,12 @@ export default function WritePage() {
       </div>
     </div>
   )
-} 
+}
+
+export default function WritePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <WritePageContent />
+    </Suspense>
+  )
+}
