@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import BottomNavigation from '../components/BottomNavigation'
 import './main.css'
+import { useRouter } from 'next/navigation'
 
 // 예시 키워드들
 const keywords = [
@@ -17,6 +18,7 @@ export default function MainPage() {
   })
   const [isLoaded, setIsLoaded] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
+  const router = useRouter()
 
   // 초기 애니메이션 시작
   useEffect(() => {
@@ -61,8 +63,8 @@ export default function MainPage() {
   }
 
   const handleWriteClick = () => {
-    // 작성하기 페이지로 이동 (나중에 구현)
-    console.log('작성하기 클릭:', currentKeyword)
+    // 키워드와 함께 작성하기 페이지로 이동
+    router.push(`/write?keyword=${encodeURIComponent(currentKeyword)}`)
   }
 
   return (
