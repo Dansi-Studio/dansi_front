@@ -16,7 +16,6 @@ export default function WritePage() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [charCount, setCharCount] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
-  const [isEditingKeyword, setIsEditingKeyword] = useState(false)
   const [tempKeyword, setTempKeyword] = useState('')
 
   useEffect(() => {
@@ -81,31 +80,6 @@ export default function WritePage() {
       if (!confirmed) return
     }
     router.back()
-  }
-
-  const handleKeywordEdit = () => {
-    setIsEditingKeyword(true)
-    setTempKeyword(keyword)
-  }
-
-  const handleKeywordSave = () => {
-    if (tempKeyword.trim()) {
-      setKeyword(tempKeyword.trim())
-    }
-    setIsEditingKeyword(false)
-  }
-
-  const handleKeywordCancel = () => {
-    setTempKeyword(keyword)
-    setIsEditingKeyword(false)
-  }
-
-  const handleKeywordKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleKeywordSave()
-    } else if (e.key === 'Escape') {
-      handleKeywordCancel()
-    }
   }
 
   return (
