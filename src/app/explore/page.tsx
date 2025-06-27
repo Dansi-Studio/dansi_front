@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 
 import { useState } from 'react'
 import Image from 'next/image'
@@ -112,90 +112,92 @@ export default function ExplorePage() {
     )
   }
 
-  const handleComment = (postId: number) => {
-    console.log('댓글 달기:', postId)
-    // 댓글 모달이나 페이지 이동 로직
-  }
-
   const handlePostClick = (postId: number) => {
-    console.log('글 상세보기:', postId)
-    // 글 상세보기 페이지로 이동
+    window.location.href = `/explore/${postId}`
   }
 
   return (
     <div className="explore-container">
       <div className="explore-header">
         <h1 className="explore-title">둘러보기</h1>
-        <div className="sort-buttons" data-active={sortType}>
+        <div className="explore-sort-buttons" data-active={sortType}>
           <button
-            className={`sort-button ${sortType === 'latest' ? 'active' : ''}`}
+            className={`explore-sort-button ${sortType === 'latest' ? 'active' : ''}`}
             onClick={() => setSortType('latest')}
           >
             최신순
           </button>
           <button
-            className={`sort-button ${sortType === 'popular' ? 'active' : ''}`}
+            className={`explore-sort-button ${sortType === 'popular' ? 'active' : ''}`}
             onClick={() => setSortType('popular')}
           >
-            조회수순
+            인기순
           </button>
         </div>
       </div>
 
-      <div className="posts-container">
+      <div className="explore-posts-container">
         {sortedPosts.map((post) => (
-          <div key={post.id} className="post-card">
-            <div className="post-header">
-              <div className="author-info">
+          <div key={post.id} className="explore-post-card">
+            <div className="explore-post-header">
+              <div className="explore-author-info">
                 <Image
                   src={post.author.avatar}
                   alt={post.author.name}
-                  width={32}
-                  height={32}
-                  className="author-avatar"
+                  width={36}
+                  height={36}
+                  className="explore-author-avatar"
                 />
-                <div className="author-details">
-                  <span className="author-name">{post.author.name}</span>
-                  <span className="post-date">{post.createdAt}</span>
+                <div className="explore-author-details">
+                  <span className="explore-author-name">{post.author.name}</span>
+                  <span className="explore-post-date">{post.createdAt}</span>
                 </div>
               </div>
-              <span className="post-keyword">오늘의 {post.keyword}</span>
+              <span className="explore-post-keyword">오늘의 {post.keyword}</span>
+            </div>
+            
+            <div className="explore-post-content" onClick={() => handlePostClick(post.id)}>
+              <h3 className="explore-post-title">{post.title}</h3>
+              <p className="explore-post-text">{post.content}</p>
             </div>
 
-            <div className="post-content" onClick={() => handlePostClick(post.id)}>
-              <h3 className="post-title">{post.title}</h3>
-              <p className="post-text">{post.content}</p>
-            </div>
-
-            <div className="post-stats">
-              <div className="stat-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div className="explore-post-stats">
+              <div className="explore-stat-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
                 </svg>
                 <span>{post.viewCount}</span>
               </div>
+              <div className="explore-stat-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                <span>{post.commentCount}</span>
+              </div>
             </div>
 
-            <div className="post-actions">
+            <div className="explore-post-actions">
               <button
-                className={`action-button heart ${post.isLiked ? 'liked' : ''}`}
-                onClick={() => handleLike(post.id)}
+                className={`explore-action-button heart ${post.isLiked ? 'liked' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleLike(post.id)
+                }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill={post.isLiked ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 3C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.99866 7.05 3C5.59096 2.99866 4.19169 3.57831 3.16 4.61C2.12831 5.64169 1.54866 7.04096 1.55 8.5C1.54866 9.95904 2.12831 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.45 8.5C22.4518 7.77752 22.3095 7.06211 22.0329 6.39457C21.7563 5.72703 21.351 5.12076 20.84 4.61Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={post.isLiked ? "currentColor" : "none"}>
+                  <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 3C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.99866 7.05 3C5.59096 2.99866 4.19169 3.57831 3.16 4.61C2.12831 5.64169 1.54866 7.04096 1.55 8.5C1.54866 9.95904 2.12831 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.45 8.5C22.4518 7.77752 22.3095 7.06211 22.0329 6.39457C21.7563 5.72703 21.351 5.12076 20.84 4.61Z" stroke="currentColor" strokeWidth="2"/>
                 </svg>
-                <span>좋아요 {post.heartCount}</span>
+                <span>{post.heartCount}</span>
               </button>
-              
               <button
-                className="action-button comment"
-                onClick={() => handleComment(post.id)}
+                className="explore-action-button comment"
+                onClick={() => handlePostClick(post.id)}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2"/>
                 </svg>
-                <span>댓글 {post.commentCount}</span>
+                <span>댓글</span>
               </button>
             </div>
           </div>
