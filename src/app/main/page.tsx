@@ -40,15 +40,6 @@ export default function MainPage() {
   useEffect(() => {
     setIsClient(true)
     
-    // 실제 뷰포트 높이를 CSS 변수로 설정
-    const setVH = () => {
-      const vh = window.innerHeight * 0.01
-      document.documentElement.style.setProperty('--vh', `${vh}px`)
-    }
-    
-    setVH()
-    window.addEventListener('resize', setVH)
-    
     // 클라이언트에서만 랜덤 키워드 설정
     const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
     setCurrentKeyword(randomKeyword);
@@ -75,7 +66,6 @@ export default function MainPage() {
     return () => {
       clearTimeout(timer)
       clearTimeout(scrollIndicatorTimer)
-      window.removeEventListener('resize', setVH)
     }
   }, [])
 

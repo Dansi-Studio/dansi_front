@@ -1,6 +1,5 @@
 .main-container {
-  height: 100%;
-  height: calc(var(--vh, 1vh) * 100); /* JavaScript로 설정한 정확한 뷰포트 높이 사용 */
+  height: 100vh;
   background-color: #FDFCFC;
   display: flex;
   flex-direction: column;
