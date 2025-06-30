@@ -7,7 +7,7 @@ import './profile.css'
 // 예시 데이터
 const userData = {
   nickname: '감성작가',
-  bio: '일상의 작은 순간들을 글로 담아내는 것을 좋아합니다.',
+  bio: '일상의 작은 순간들을\n글로 담아내는 것을 좋아합니다.',
   profileImage: '/default-profile.svg',
   joinDate: '2024.01.15',
   email: 'writer@dansi.com',
