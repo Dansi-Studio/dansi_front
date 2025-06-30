@@ -1,5 +1,6 @@
 .main-container {
   min-height: 100vh;
+  min-height: 100dvh; /* 동적 뷰포트 높이 사용 */
   background-color: #FDFCFC;
   display: flex;
   flex-direction: column;
@@ -31,6 +32,7 @@
 /* 메인 콘텐츠 */
 .main-content {
   min-height: 100vh;
+  min-height: 100dvh; /* 동적 뷰포트 높이 사용 */
   display: flex;
   justify-content: center;
   align-items: center;

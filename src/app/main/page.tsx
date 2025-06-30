@@ -71,51 +71,65 @@ export default function MainPage() {
 
   // 스크롤 이벤트 처리
   useEffect(() => {
+    let throttleTimer: NodeJS.Timeout | null = null
+    
     const handleScroll = () => {
-      const scrollPosition = window.scrollY
+      if (throttleTimer) return
       
-      console.log('현재 스크롤 위치:', scrollPosition) // 디버깅용
-      
-      // 스크롤이 50px 이상 내려왔을 때 건네는 글감 제목 섹션 표시 (더 빠르게)
-      if (scrollPosition > 50) {
-        console.log('건네는 글감 표시 - 스크롤:', scrollPosition)
-        setShowInspiration(true)
-      }
-      
-      // 스크롤이 100px 이상 내려왔을 때 키워드 그리드 표시
-      if (scrollPosition > 100) {
-        console.log('키워드 그리드 표시 - 스크롤:', scrollPosition)
-        setShowKeywordGrid(true)
-      }
-      
-      // 스크롤이 조금이라도 내려왔으면 스크롤 안내 숨기기
-      if (scrollPosition > 30) {
-        setShowScrollIndicator(false)
-      } else {
-        setShowScrollIndicator(true)
-      }
+      throttleTimer = setTimeout(() => {
+        const scrollPosition = window.scrollY
+        const viewportHeight = window.innerHeight
+        
+        // 뷰포트 높이를 기준으로 한 비율 계산 (더 일관된 동작)
+        const scrollRatio = scrollPosition / viewportHeight
+        
+        console.log('현재 스크롤 위치:', scrollPosition, '뷰포트 높이:', viewportHeight, '비율:', scrollRatio) // 디버깅용
+        
+        // 뷰포트 높이의 5% 이상 스크롤 시 건네는 글감 제목 섹션 표시
+        if (scrollRatio > 0.05) {
+          console.log('건네는 글감 표시 - 스크롤 비율:', scrollRatio)
+          setShowInspiration(true)
+        }
+        
+        // 뷰포트 높이의 10% 이상 스크롤 시 키워드 그리드 표시  
+        if (scrollRatio > 0.1) {
+          console.log('키워드 그리드 표시 - 스크롤 비율:', scrollRatio)
+          setShowKeywordGrid(true)
+        }
+        
+        // 뷰포트 높이의 3% 이상 스크롤 시 스크롤 안내 숨기기
+        if (scrollRatio > 0.03) {
+          setShowScrollIndicator(false)
+        } else {
+          setShowScrollIndicator(true)
+        }
+        
+        throttleTimer = null
+      }, 16) // 약 60fps로 제한
     }
 
     // 컴포넌트 마운트 직후 초기 상태 설정
     const initializeScrollState = () => {
       const scrollPosition = window.scrollY
+      const viewportHeight = window.innerHeight
+      const scrollRatio = scrollPosition / viewportHeight
       
-      console.log('초기 스크롤 위치:', scrollPosition) // 디버깅용
+      console.log('초기 스크롤 위치:', scrollPosition, '뷰포트 높이:', viewportHeight, '비율:', scrollRatio) // 디버깅용
       
-      // 초기 스크롤 위치가 30px 이하면 스크롤 안내 표시
-      if (scrollPosition <= 30) {
+      // 초기 스크롤 비율이 3% 이하면 스크롤 안내 표시
+      if (scrollRatio <= 0.03) {
         setShowScrollIndicator(true)
       } else {
         setShowScrollIndicator(false)
       }
       
       // 초기 스크롤 위치에 따라 건네는 글감 섹션 표시 여부 결정
-      if (scrollPosition > 50) {
+      if (scrollRatio > 0.05) {
         console.log('초기 건네는 글감 표시')
         setShowInspiration(true)
       }
       
-      if (scrollPosition > 100) {
+      if (scrollRatio > 0.1) {
         console.log('초기 키워드 그리드 표시')
         setShowKeywordGrid(true)
       }
@@ -126,10 +140,17 @@ export default function MainPage() {
       initializeScrollState()
     }, 100)
 
+    // 리사이즈 이벤트도 처리하여 화면 회전 등에 대응
+    const handleResize = () => {
+      initializeScrollState()
+    }
+
     window.addEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
       clearTimeout(initTimer)
     }
   }, [])
