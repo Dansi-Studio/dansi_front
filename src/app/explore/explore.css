@@ -1,7 +1,10 @@
 .explore-container {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   background-color: #FAFAFA;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 

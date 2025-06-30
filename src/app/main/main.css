@@ -1,14 +1,13 @@
 .main-container {
-  min-height: 100vh;
-  min-height: 100dvh; /* 동적 뷰포트 높이 사용 */
+  height: 100vh;
+  height: 100dvh; /* 동적 뷰포트 높이 사용 */
   background-color: #FDFCFC;
   display: flex;
   flex-direction: column;
   font-family: var(--font-sunflower), sans-serif;
   position: relative;
-  overflow-y: auto;
+  overflow-y: auto; /* 메인 컨테이너 내부에서만 스크롤 */
   overflow-x: hidden;
-  height: 100vh;
   -webkit-overflow-scrolling: touch;
   padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
