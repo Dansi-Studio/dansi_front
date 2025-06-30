@@ -89,7 +89,7 @@
   position: relative;
   z-index: 1;
   padding: 20px;
-  padding-bottom: 140px;
+  padding-bottom: calc(max(140px, env(safe-area-inset-bottom, 140px)) + 20px);
   min-height: 100vh;
 }
 

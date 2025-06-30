@@ -227,6 +227,7 @@
 .write-content {
   flex: 1;
   padding: 20px;
+  padding-bottom: calc(max(80px, env(safe-area-inset-bottom, 80px)) + 20px);
   max-width: 800px;
   margin: 0 auto;
   width: 100%;

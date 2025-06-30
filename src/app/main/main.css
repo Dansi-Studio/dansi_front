@@ -9,6 +9,7 @@
   overflow-x: hidden;
   height: 100vh;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 
 /* 헤더 - 로고 */

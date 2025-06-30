@@ -1,7 +1,7 @@
 .explore-container {
   min-height: 100vh;
   background-color: #FAFAFA;
-  padding-bottom: 80px;
+  padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 
 .explore-header {
