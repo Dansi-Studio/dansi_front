@@ -1,9 +1,7 @@
 .explore-container {
-  height: 100%;
+  min-height: 100vh;
   background-color: #FAFAFA;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 
 .explore-header {

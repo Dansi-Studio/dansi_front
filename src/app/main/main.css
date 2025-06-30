@@ -1,13 +1,11 @@
 .main-container {
-  height: 100%;
+  min-height: 100vh;
   background-color: #FDFCFC;
   display: flex;
   flex-direction: column;
   font-family: var(--font-sunflower), sans-serif;
   position: relative;
-  overflow-y: auto; /* 메인 컨테이너 내부에서만 스크롤 */
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 
 /* 헤더 - 로고 */
@@ -29,7 +27,6 @@
 /* 메인 콘텐츠 */
 .main-content {
   min-height: 100vh;
-  min-height: 100dvh; /* 동적 뷰포트 높이 사용 */
   display: flex;
   justify-content: center;
   align-items: center;
