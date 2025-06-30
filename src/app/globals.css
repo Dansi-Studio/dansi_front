@@ -2,24 +2,18 @@
 
 /* 모바일 앱처럼 고정된 화면 설정 */
 html {
-  height: 100vh;
-  height: 100dvh; /* 동적 뷰포트 높이 사용 */
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
+  overflow: hidden;
 }
 
 html, body {
-  height: 100vh;
-  height: 100dvh; /* 동적 뷰포트 높이 사용 */
+  height: 100%;
   width: 100%;
   overflow: hidden; /* 전체 스크롤 방지 */
   position: fixed; /* 전체 화면 고정 */
   margin: 0;
   padding: 0;
-  padding-top: env(safe-area-inset-top, 0);
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  padding-left: env(safe-area-inset-left, 0);
-  padding-right: env(safe-area-inset-right, 0);
+  /* safe-area 패딩 제거 - 각 컴포넌트에서 필요시 개별 적용 */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
