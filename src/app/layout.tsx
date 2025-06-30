@@ -59,8 +59,16 @@ export default function RootLayout({
     <html lang="ko">
       <body
         className={`${sunflower.variable} antialiased font-sans`}
+        style={{
+          height: '100vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        {children}
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          {children}
+        </div>
       </body>
     </html>
   );

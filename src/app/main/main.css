@@ -1,5 +1,5 @@
 .main-container {
-  height: 100vh;
+  height: 100%;
   background-color: #FDFCFC;
   display: flex;
   flex-direction: column;
@@ -8,7 +8,6 @@
   overflow-y: auto; /* 메인 컨테이너 내부에서만 스크롤 */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(max(100px, env(safe-area-inset-bottom, 100px)) + 16px);
 }
 
 /* 헤더 - 로고 */
