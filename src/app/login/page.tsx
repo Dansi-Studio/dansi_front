@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loginMember, tokenStorage, userStorage, checkAutoLogin } from '../../utils/api'
 import './login.css'
 
-export default function LoginPage() {
+// useSearchParams를 사용하는 컴포넌트를 분리
+function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
@@ -185,5 +186,14 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+// Suspense로 감싼 메인 컴포넌트
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="login-container"><div>로딩 중...</div></div>}>
+      <LoginPageContent />
+    </Suspense>
   )
 } 

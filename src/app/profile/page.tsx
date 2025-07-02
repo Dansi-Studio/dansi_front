@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import BottomNavigation from '../components/BottomNavigation'
 import './profile.css'
 import { 
@@ -91,7 +91,7 @@ export default function ProfilePage() {
   const router = useRouter()
 
   // 사용자 시 목록 로드 (페이지네이션)
-  const loadUserPoems = async (page: number = 0) => {
+  const loadUserPoems = useCallback(async (page: number = 0) => {
     if (!userData) return
     
     setIsLoadingPoems(true)
@@ -108,7 +108,7 @@ export default function ProfilePage() {
     } finally {
       setIsLoadingPoems(false)
     }
-  }
+  }, [userData, pageSize])
 
   // 페이지 변경 핸들러
   const handlePageChange = (newPage: number) => {
@@ -200,7 +200,7 @@ export default function ProfilePage() {
     if (userData && activeTab === 'posts') {
       loadUserPoems(0) // 첫 번째 페이지부터 로드
     }
-  }, [userData, activeTab])
+  }, [userData, activeTab, loadUserPoems])
 
   // 탭 변경 시 시 목록 로드
   const handleTabChange = (tab: string) => {
