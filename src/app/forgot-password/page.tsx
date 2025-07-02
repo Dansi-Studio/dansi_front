@@ -1,13 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { checkAutoLogin } from '../../utils/api'
 import './forgot-password.css'
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+
+  // 자동 로그인 체크
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const userData = await checkAutoLogin()
+        
+        if (userData) {
+          // 토큰이 유효하면 메인 페이지로 이동
+          router.push('/main')
+          return
+        }
+      } catch (error) {
+        console.error('인증 확인 오류:', error)
+      } finally {
+        setIsCheckingAuth(false)
+      }
+    }
+
+    checkAuthentication()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,6 +68,11 @@ export default function ForgotPasswordPage() {
 
   const handleBack = () => {
     router.back()
+  }
+
+  // 인증 확인 중일 때는 그냥 빈 화면을 보여줌
+  if (isCheckingAuth) {
+    return <div></div>
   }
 
   return (

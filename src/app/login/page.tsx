@@ -1,23 +1,70 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { loginMember, tokenStorage, userStorage, checkAutoLogin } from '../../utils/api'
 import './login.css'
 
 export default function LoginPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 자동 로그인 체크
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const userData = await checkAutoLogin()
+        
+        if (userData) {
+          // 토큰이 유효하면 메인 페이지로 이동
+          router.push('/main')
+          return
+        }
+      } catch (error) {
+        console.error('인증 확인 오류:', error)
+      } finally {
+        setIsCheckingAuth(false)
+      }
+    }
+
+    checkAuthentication()
+  }, [router])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 로그인 로직 구현
-    console.log('로그인 시도:', formData)
-    
-    // 로그인 성공 시 메인 페이지로 이동
-    router.push('/main')
+    setIsLoading(true)
+    setError('')
+
+    try {
+      // 백엔드 로그인 API 호출
+      const response = await loginMember({
+        email: formData.email,
+        password: formData.password
+      })
+
+      if (response.success && response.data) {
+        // 로그인 성공 - Access Token과 Refresh Token 저장
+        tokenStorage.setAccessToken(response.data.accessToken)
+        tokenStorage.setRefreshToken(response.data.refreshToken)
+        userStorage.setUser(response.data.member)
+        
+        // 메인 페이지로 이동
+        router.push('/main')
+      } else {
+        setError(response.message || '로그인에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('로그인 오류:', error)
+      setError('로그인 중 오류가 발생했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +73,11 @@ export default function LoginPage() {
       ...prev,
       [name]: value
     }))
+    
+    // 입력 시 에러 메시지 초기화
+    if (error) {
+      setError('')
+    }
   }
 
   const handleSignup = () => {
@@ -42,6 +94,11 @@ export default function LoginPage() {
     router.back()
   }
 
+  // 인증 확인 중일 때는 그냥 빈 화면 또는 기존 로딩을 유지
+  if (isCheckingAuth) {
+    return <div></div>
+  }
+
   return (
     <div className="login-container">
       <div className="login-header">
@@ -56,16 +113,17 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
             <input
-              type="text"
-              name="username"
-              placeholder="아이디"
-              value={formData.username}
+              type="email"
+              name="email"
+              placeholder="이메일"
+              value={formData.email}
               onChange={handleInputChange}
               className="login-input"
               required
+              disabled={isLoading}
             />
           </div>
-          
+
           <div className="input-group">
             <input
               type="password"
@@ -75,26 +133,39 @@ export default function LoginPage() {
               onChange={handleInputChange}
               className="login-input"
               required
+              disabled={isLoading}
             />
           </div>
 
-          <button
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          <button 
             type="button"
             onClick={handleForgotPassword}
             className="forgot-password-link"
+            disabled={isLoading}
           >
             비밀번호 찾기
           </button>
 
           <div className="button-group">
-            <button type="submit" className="login-button">
-              로그인
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={isLoading}
+            >
+              {isLoading ? '로그인 중...' : '로그인'}
             </button>
             
-            <button
-              type="button"
+            <button 
+              type="button" 
               onClick={handleSignup}
               className="signup-button"
+              disabled={isLoading}
             >
               회원가입
             </button>

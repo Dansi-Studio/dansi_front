@@ -26,6 +26,11 @@
   color: #2E2014;
 }
 
+.back-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .signup-content {
   display: flex;
   flex-direction: column;
@@ -91,6 +96,30 @@
   transform: translateY(-1px);
 }
 
+.signup-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: rgba(115, 80, 48, 0.05);
+}
+
+/* 에러 메시지 스타일 */
+.error-message {
+  background-color: #FFE6E6;
+  color: #D8000C;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 8px 0;
+  border-left: 4px solid #D8000C;
+  font-family: var(--font-sunflower), sans-serif;
+}
+
+.email-error {
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
 .verify-button {
   background-color: #735030;
   color: #FFFFFF;
@@ -119,6 +148,7 @@
 
 .verify-button:disabled {
   opacity: 0.8;
+  cursor: not-allowed;
 }
 
 .button-group {
@@ -143,10 +173,17 @@
   transition: all 0.2s ease;
 }
 
-.confirm-button:hover {
+.confirm-button:hover:not(:disabled) {
   background-color: #2E2014;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(115, 80, 48, 0.3);
+}
+
+.confirm-button:disabled {
+  background-color: #CCCCCC;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .cancel-button {
@@ -163,10 +200,17 @@
   transition: all 0.2s ease;
 }
 
-.cancel-button:hover {
+.cancel-button:hover:not(:disabled) {
   background-color: rgba(115, 80, 48, 0.15);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(115, 80, 48, 0.1);
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* 반응형 디자인 */
@@ -195,5 +239,10 @@
   .cancel-button {
     padding: 14px;
     font-size: 14px;
+  }
+  
+  .error-message {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 } 

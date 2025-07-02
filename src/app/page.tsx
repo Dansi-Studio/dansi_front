@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { checkAutoLogin } from '../utils/api'
 import './home.css'
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
   
   const [logoLoaded, setLogoLoaded] = useState(false)
   const [showButtons, setShowButtons] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   const handleKakaoLogin = () => {
     // 카카오 로그인 로직
@@ -69,6 +71,31 @@ export default function Home() {
       clearTimeout(buttonTimer)
     }
   }, [])
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const userData = await checkAutoLogin()
+        
+        if (userData) {
+          // 토큰이 유효하면 메인 페이지로 이동
+          router.push('/main')
+          return
+        }
+      } catch (error) {
+        console.error('인증 확인 오류:', error)
+      } finally {
+        setIsCheckingAuth(false)
+      }
+    }
+
+    checkAuthentication()
+  }, [router])
+
+  // 인증 확인 중일 때는 그냥 빈 화면을 보여줌
+  if (isCheckingAuth) {
+    return <div></div>
+  }
 
   return (
     <div className="home-container">
