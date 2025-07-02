@@ -29,9 +29,15 @@ export interface Poem {
   poemId: number;
   title: string;
   keyword: string;
+  content: string;
   createdAt: string;
   viewCount: number;
   likeCount: number;
+  member?: {
+    memberId: number;
+    name: string;
+    img?: string;
+  };
 }
 
 // 프로필 업데이트 요청 타입
@@ -472,5 +478,84 @@ export async function getMemberStats(memberId: number): Promise<ApiResponse<Memb
 export async function getMemberProfile(memberId: number): Promise<ApiResponse<Member>> {
   return apiCall<Member>(`/members/${memberId}`, {
     method: 'GET',
+  });
+}
+
+// 시 작성 요청 타입
+export interface PoemCreateRequest {
+  keyword: string;
+  title: string;
+  content: string;
+  memberId: number;
+}
+
+// 시 수정 요청 타입
+export interface PoemUpdateRequest {
+  keyword?: string;
+  title?: string;
+  content?: string;
+}
+
+// 시 관련 API 함수들
+
+// 시 작성
+export async function createPoem(poemData: PoemCreateRequest): Promise<ApiResponse<Poem>> {
+  return apiCall<Poem>('/poems', {
+    method: 'POST',
+    body: JSON.stringify(poemData),
+  });
+}
+
+// 시 조회 (ID로)
+export async function getPoemById(poemId: number): Promise<ApiResponse<Poem>> {
+  return apiCall<Poem>(`/poems/${poemId}`, {
+    method: 'GET',
+  });
+}
+
+// 시 목록 조회 (페이지네이션)
+export async function getPoems(
+  page: number = 0,
+  size: number = 10,
+  sort: string = 'latest'
+): Promise<ApiResponse<PageResponse<Poem>>> {
+  return apiCall<PageResponse<Poem>>(`/poems?page=${page}&size=${size}&sort=${sort}`, {
+    method: 'GET',
+  });
+}
+
+// 키워드로 시 검색
+export async function getPoemsByKeyword(keyword: string): Promise<ApiResponse<Poem[]>> {
+  return apiCall<Poem[]>(`/poems/search/keyword/${encodeURIComponent(keyword)}`, {
+    method: 'GET',
+  });
+}
+
+// 제목으로 시 검색
+export async function getPoemsByTitle(title: string): Promise<ApiResponse<Poem[]>> {
+  return apiCall<Poem[]>(`/poems/search/title?title=${encodeURIComponent(title)}`, {
+    method: 'GET',
+  });
+}
+
+// 작성자별 시 조회
+export async function getPoemsByMember(memberId: number): Promise<ApiResponse<Poem[]>> {
+  return apiCall<Poem[]>(`/poems/member/${memberId}`, {
+    method: 'GET',
+  });
+}
+
+// 시 수정
+export async function updatePoem(poemId: number, poemData: PoemUpdateRequest): Promise<ApiResponse<Poem>> {
+  return apiCall<Poem>(`/poems/${poemId}`, {
+    method: 'PUT',
+    body: JSON.stringify(poemData),
+  });
+}
+
+// 시 삭제
+export async function deletePoem(poemId: number, memberId: number): Promise<ApiResponse<null>> {
+  return apiCall<null>(`/poems/${poemId}?memberId=${memberId}`, {
+    method: 'DELETE',
   });
 } 

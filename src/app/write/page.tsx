@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { createPoem, userStorage, type PoemCreateRequest } from '../../utils/api'
 import './write.css'
 
 function WritePageContent() {
@@ -17,8 +18,22 @@ function WritePageContent() {
   const [charCount, setCharCount] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
   const [tempKeyword, setTempKeyword] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
+    // 로그인 상태 확인
+    const user = userStorage.getUser()
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      router.push('/login')
+      return
+    }
+    
+    setCurrentUser(user)
+    setIsLoggedIn(true)
+
     const keywordParam = searchParams.get('keyword')
     if (keywordParam) {
       setKeyword(keywordParam)
@@ -36,7 +51,7 @@ function WritePageContent() {
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [searchParams])
+  }, [searchParams, router])
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
@@ -54,21 +69,37 @@ function WritePageContent() {
       return
     }
 
+    if (!currentUser) {
+      alert('로그인이 필요합니다.')
+      router.push('/login')
+      return
+    }
+
     setIsSaving(true)
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const poemData: PoemCreateRequest = {
+        keyword: keyword.trim(),
+        title: title.trim(),
+        content: content.trim(),
+        memberId: currentUser.memberId
+      }
+
+      console.log('시 작성 요청:', poemData)
+
+      const response = await createPoem(poemData)
       
-      console.log('저장된 글:', {
-        keyword,
-        title,
-        content,
-        createdAt: new Date().toISOString()
-      })
-      
+      if (response.success && response.data) {
+        console.log('시 작성 성공:', response.data)
+        alert('시가 성공적으로 발행되었습니다!')
       router.push('/main')
+      } else {
+        console.error('시 작성 실패:', response.message)
+        alert(`시 작성에 실패했습니다: ${response.message || '알 수 없는 오류'}`)
+      }
     } catch (error) {
-      console.error('저장 중 오류:', error)
+      console.error('시 작성 중 오류:', error)
+      alert('시 작성 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsSaving(false)
     }
@@ -80,6 +111,17 @@ function WritePageContent() {
       if (!confirmed) return
     }
     router.back()
+  }
+
+  // 로그인되지 않은 경우 로딩 화면 표시
+  if (!isLoggedIn) {
+    return (
+      <div className="write-container">
+        <div className="loading">
+          <p>로그인 확인 중...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -102,15 +144,13 @@ function WritePageContent() {
             onClick={handleSave}
             disabled={isSaving || !content.trim() || !title.trim()}
           >
-            {isSaving ? '저장중...' : '발행'}
+            {isSaving ? '발행 중...' : '발행'}
           </button>
         </div>
       </div>
 
       {/* 메인 콘텐츠 */}
       <div className={`write-content ${isLoaded ? 'loaded' : ''}`}>
-        {/* 키워드 섹션 */}
- 
         <div className="input-section">
           <input
             ref={titleRef}
@@ -145,7 +185,13 @@ function WritePageContent() {
 
 export default function WritePage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="write-container">
+        <div className="loading">
+          <p>페이지 로딩 중...</p>
+        </div>
+      </div>
+    }>
       <WritePageContent />
     </Suspense>
   )

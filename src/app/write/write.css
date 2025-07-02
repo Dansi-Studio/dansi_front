@@ -1041,3 +1041,20 @@
     transform: translateY(0);
   }
 } 
+
+/* 로딩 화면 스타일 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--background-gradient);
+  font-family: var(--font-sunflower), serif;
+}
+
+.loading p {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.7;
+} 

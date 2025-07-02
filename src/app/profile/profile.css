@@ -986,7 +986,7 @@
 .profile-image-frame:hover .profile-svg-container {
   border-color: rgba(115, 80, 48, 0.25);
   box-shadow: 0 6px 20px rgba(115, 80, 48, 0.15);
-}
+} 
 
 /* 프로필 이미지 SVG 스타일 */
 .profile-svg {

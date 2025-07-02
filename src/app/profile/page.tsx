@@ -402,17 +402,17 @@ export default function ProfilePage() {
         <div className={`stats-grid ${isLoaded ? 'loaded' : ''}`}>
           <div className="stat-card">
             <div className="stat-icon">📝</div>
-            <div className="stat-number">{userStats?.totalWrites || 0}</div>
+            <div className="stat-number">{typeof userStats?.totalWrites === 'number' ? userStats.totalWrites : 0}</div>
             <div className="stat-label">작성한 글</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">❤️</div>
-            <div className="stat-number">{userStats?.totalLikes || 0}</div>
+            <div className="stat-number">{typeof userStats?.totalLikes === 'number' ? userStats.totalLikes : 0}</div>
             <div className="stat-label">받은 좋아요</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">👀</div>
-            <div className="stat-number">{userStats?.totalViews || 0}</div>
+            <div className="stat-number">{typeof userStats?.totalViews === 'number' ? userStats.totalViews : 0}</div>
             <div className="stat-label">총 조회수</div>
           </div>
         </div>
@@ -499,14 +499,14 @@ export default function ProfilePage() {
               
               {!isLoadingPoems && (
                 <>
-                  {userPoems.map(poem => (
-                    <div key={poem.poemId} className="post-card">
-                      <div className="post-keyword">{poem.keyword}</div>
+                  {userPoems.map((poem, index) => (
+                    <div key={poem?.poemId || `poem-${index}`} className="post-card">
+                      <div className="post-keyword">{poem?.keyword || '키워드 없음'}</div>
                       <div className="post-content">
-                        <h3 className="post-title">{poem.title}</h3>
+                        <h3 className="post-title">{poem?.title || '제목 없음'}</h3>
                         <div className="post-meta">
-                          <span className="post-date">{formatDate(poem.createdAt)}</span>
-                          <span className="post-likes">❤️ {poem.likeCount}</span>
+                          <span className="post-date">{poem?.createdAt ? formatDate(poem.createdAt) : '날짜 없음'}</span>
+                          <span className="post-likes">❤️ {poem?.likeCount || 0}</span>
                         </div>
                       </div>
                     </div>
