@@ -5,28 +5,12 @@ import Image from 'next/image'
 import BottomNavigation from '../components/BottomNavigation'
 import './main.css'
 import { useRouter } from 'next/navigation'
-
-// 예시 키워드들
-const keywords = [
-  '노을', '바람', '향기', '기억', '고요', '여운', '빛', '소리', '그리움', '설렘', '여행', '자유', '희망', '온기', '순간', '파도', '별빛', '안개', '무지개', '하늘', '추억', '바다', '꿈', '사랑', '봄날', '겨울밤', '여름', '가을', '아침', '저녁', '낮', '밤하늘', '별', '달빛', '햇살', '비', '눈', '꽃잎', '숲', '강물', '산', '들판', '바위', '모래', '구름', '비행', '산책', '노래', '시', '이야기'
-]
-
-// 건네는 글감용 키워드들 (더 많은 키워드)
-const inspirationKeywords = [
-  '노을', '바람', '향기', '기억', '고요', '여운', '빛', '소리', '그리움', '설렘', 
-  '여행', '자유', '희망', '온기', '순간', '파도', '별빛', '안개', '무지개', '하늘', 
-  '추억', '바다', '꿈', '사랑', '봄날', '겨울밤', '여름', '가을', '아침', '저녁', 
-  '낮', '밤하늘', '별', '달빛', '햇살', '비', '눈', '꽃잎', '숲', '강물', 
-  '산', '들판', '바위', '모래', '구름', '비행', '산책', '노래', '시', '이야기',
-  '미소', '웃음', '눈물', '행복', '슬픔', '기쁨', '평화', '고독', '친구', '가족',
-  '집', '길', '다리', '문', '창문', '책', '편지', '음악', '그림', '사진',
-  '커피', '차', '빵', '꽃', '나무', '잎', '뿌리', '씨앗', '열매', '향수',
-  '시간', '공간', '거리', '골목', '공원', '학교', '도서관', '카페', '바다', '호수',
-  '강', '계곡', '폭포', '섬', '언덕', '평원', '사막', '정원', '마당', '옥상'
-]
+import { getRandomKeywords } from '../../utils/api'
 
 export default function MainPage() {
-  const [currentKeyword, setCurrentKeyword] = useState('영감') // 고정된 초기값
+  const [currentKeyword, setCurrentKeyword] = useState('영감') // 기본값
+  const [keywords, setKeywords] = useState<string[]>([]) // 랜덤 키워드 변경용
+  const [inspirationKeywords, setInspirationKeywords] = useState<string[]>([]) // 그리드 표시용
   const [isLoaded, setIsLoaded] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
   const [showInspiration, setShowInspiration] = useState(false) // 제목과 설명 부분
@@ -36,20 +20,54 @@ export default function MainPage() {
   const [showScrollIndicator, setShowScrollIndicator] = useState(true)
   const router = useRouter()
 
-  // 초기 애니메이션 시작 및 랜덤 키워드 설정
+  // 백엔드에서 키워드 받아오기
+  useEffect(() => {
+    const fetchKeywords = async () => {
+      try {
+        // 병렬로 키워드 요청
+        const [randomKeywordsResponse, inspirationKeywordsResponse] = await Promise.all([
+          getRandomKeywords(20), // 랜덤 키워드 변경용으로 20개
+          getRandomKeywords(80)  // 그리드 표시용으로 80개
+        ])
+        
+        if (randomKeywordsResponse.success && randomKeywordsResponse.data) {
+          const keywordStrings = randomKeywordsResponse.data.map(k => k.keyword)
+          setKeywords(keywordStrings)
+          
+          // 첫 번째 키워드를 현재 키워드로 설정
+          if (keywordStrings.length > 0) {
+            setCurrentKeyword(keywordStrings[0])
+          }
+        }
+        
+        if (inspirationKeywordsResponse.success && inspirationKeywordsResponse.data) {
+          const inspirationKeywordStrings = inspirationKeywordsResponse.data.map(k => k.keyword)
+          setInspirationKeywords(inspirationKeywordStrings)
+          
+          // 키워드 카드 크기들을 클라이언트에서만 생성 - 핀터레스트 스타일
+          const sizes = inspirationKeywordStrings.map(() => {
+            const sizeOptions = ['small', 'small', 'medium', 'large', 'large'] // large를 더 많이 추가하여 공간 채우기
+            return sizeOptions[Math.floor(Math.random() * sizeOptions.length)]
+          })
+          setKeywordSizes(sizes)
+        }
+        
+      } catch (error) {
+        console.error('키워드 로딩 오류:', error)
+        // 에러 시 기본 키워드들 사용
+        const defaultKeywords = ['영감', '바람', '노을', '향기', '기억', '고요', '여운', '빛']
+        setKeywords(defaultKeywords)
+        setInspirationKeywords(defaultKeywords)
+        setCurrentKeyword(defaultKeywords[0])
+      }
+    }
+
+    fetchKeywords()
+  }, [])
+
+  // 초기 애니메이션 시작
   useEffect(() => {
     setIsClient(true)
-    
-    // 클라이언트에서만 랜덤 키워드 설정
-    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
-    setCurrentKeyword(randomKeyword);
-    
-    // 키워드 카드 크기들을 클라이언트에서만 생성 - 핀터레스트 스타일
-    const sizes = inspirationKeywords.map(() => {
-      const sizeOptions = ['small', 'small', 'medium', 'large', 'large'] // large를 더 많이 추가하여 공간 채우기
-      return sizeOptions[Math.floor(Math.random() * sizeOptions.length)]
-    })
-    setKeywordSizes(sizes)
     
     // 컴포넌트 마운트 시 애니메이션 시작
     const timer = setTimeout(() => {
@@ -155,8 +173,10 @@ export default function MainPage() {
     }
   }, [])
 
-  // 키워드 동적 변경 (예시)
+  // 키워드 동적 변경 (백엔드에서 받은 키워드 사용)
   useEffect(() => {
+    if (keywords.length === 0) return // 키워드가 없으면 실행하지 않음
+    
     const interval = setInterval(() => {
       // 키워드 변경 애니메이션 시작
       setIsChanging(true)
@@ -174,7 +194,7 @@ export default function MainPage() {
     }, 3000) // 3초마다 변경
 
     return () => clearInterval(interval)
-  }, [])
+  }, [keywords])
 
   // 한글자면 좌우에 공백 추가
   const formatKeyword = (keyword: string) => {

@@ -19,6 +19,11 @@ export interface Member {
   updatedAt: string;
 }
 
+// 키워드 타입
+export interface Keyword {
+  keyword: string;
+}
+
 // 로그인 요청 타입
 export interface LoginRequest {
   email: string;
@@ -349,4 +354,27 @@ export async function checkAutoLogin(): Promise<LoginResponse | null> {
 export function logout() {
   tokenStorage.removeTokens();
   userStorage.removeUser();
+}
+
+// 키워드 관련 API 함수들
+
+// 랜덤 키워드 조회 - 지정된 개수만큼
+export async function getRandomKeywords(limit: number = 50): Promise<ApiResponse<Keyword[]>> {
+  return apiCall<Keyword[]>(`/keywords/random?limit=${limit}`, {
+    method: 'GET',
+  });
+}
+
+// 랜덤 키워드 1개 조회
+export async function getRandomKeyword(): Promise<ApiResponse<Keyword>> {
+  return apiCall<Keyword>('/keywords/random/single', {
+    method: 'GET',
+  });
+}
+
+// 모든 키워드 조회
+export async function getAllKeywords(): Promise<ApiResponse<Keyword[]>> {
+  return apiCall<Keyword[]>('/keywords', {
+    method: 'GET',
+  });
 } 
