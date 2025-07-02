@@ -1,0 +1,21 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 토끼 얼굴 -->
+  <circle cx="50" cy="55" r="22" fill="#FFFEF7" stroke="#735030" stroke-width="2.5"/>
+  <!-- 토끼 긴 귀 -->
+  <ellipse cx="44" cy="25" rx="4" ry="18" fill="#FFFEF7" stroke="#735030" stroke-width="2.5"/>
+  <ellipse cx="56" cy="25" rx="4" ry="18" fill="#FFFEF7" stroke="#735030" stroke-width="2.5"/>
+  <!-- 귀 안쪽 -->
+  <ellipse cx="44" cy="25" rx="2" ry="12" fill="none" stroke="#A68B6B" stroke-width="1.5"/>
+  <ellipse cx="56" cy="25" rx="2" ry="12" fill="none" stroke="#A68B6B" stroke-width="1.5"/>
+  <!-- 눈 -->
+  <circle cx="45" cy="50" r="2" fill="#735030"/>
+  <circle cx="55" cy="50" r="2" fill="#735030"/>
+  <!-- 코 -->
+  <path d="M48 58 L52 58 L50 61" fill="#A68B6B" stroke-linejoin="round"/>
+  <!-- 입 -->
+  <path d="M50 61 Q46 65 44 63" stroke="#735030" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M50 61 Q54 65 56 63" stroke="#735030" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- 앞니 -->
+  <rect x="49" y="64" width="1" height="2.5" fill="#FFFEF7" stroke="#735030" stroke-width="0.8"/>
+  <rect x="50" y="64" width="1" height="2.5" fill="#FFFEF7" stroke="#735030" stroke-width="0.8"/>
+</svg> 

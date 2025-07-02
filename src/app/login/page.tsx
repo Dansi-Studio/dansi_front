@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { loginMember, tokenStorage, userStorage, checkAutoLogin } from '../../utils/api'
 import './login.css'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -15,6 +16,9 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
+  // redirect 파라미터 확인
+  const redirectTo = searchParams.get('redirect')
+
   // 자동 로그인 체크
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -22,8 +26,12 @@ export default function LoginPage() {
         const userData = await checkAutoLogin()
         
         if (userData) {
-          // 토큰이 유효하면 메인 페이지로 이동
-          router.push('/main')
+          // 토큰이 유효하면 redirect 파라미터에 따라 이동
+          if (redirectTo === 'profile') {
+            router.push('/profile')
+          } else {
+            router.push('/main')
+          }
           return
         }
       } catch (error) {
@@ -34,7 +42,7 @@ export default function LoginPage() {
     }
 
     checkAuthentication()
-  }, [router])
+  }, [router, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,8 +62,12 @@ export default function LoginPage() {
         tokenStorage.setRefreshToken(response.data.refreshToken)
         userStorage.setUser(response.data.member)
         
-        // 메인 페이지로 이동
-        router.push('/main')
+        // redirect 파라미터에 따라 이동
+        if (redirectTo === 'profile') {
+          router.push('/profile')
+        } else {
+          router.push('/main')
+        }
       } else {
         setError(response.message || '로그인에 실패했습니다.')
       }

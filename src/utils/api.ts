@@ -24,6 +24,50 @@ export interface Keyword {
   keyword: string;
 }
 
+// 시 타입 (프로필용)
+export interface Poem {
+  poemId: number;
+  title: string;
+  keyword: string;
+  createdAt: string;
+  viewCount: number;
+  likeCount: number;
+}
+
+// 프로필 업데이트 요청 타입
+export interface ProfileUpdateRequest {
+  name: string;
+  bio?: string;
+  img?: string;
+}
+
+// 비밀번호 변경 요청 타입
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+// 사용자 통계 타입
+export interface MemberStats {
+  totalWrites: number;
+  totalLikes: number;
+  totalViews: number;
+  joinDate: string;
+}
+
+// 페이지네이션 응답 타입
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 // 로그인 요청 타입
 export interface LoginRequest {
   email: string;
@@ -375,6 +419,58 @@ export async function getRandomKeyword(): Promise<ApiResponse<Keyword>> {
 // 모든 키워드 조회
 export async function getAllKeywords(): Promise<ApiResponse<Keyword[]>> {
   return apiCall<Keyword[]>('/keywords', {
+    method: 'GET',
+  });
+}
+
+// 프로필 관련 API 함수들
+
+// 프로필 정보 업데이트
+export async function updateProfile(memberId: number, profileData: ProfileUpdateRequest): Promise<ApiResponse<Member>> {
+  return apiCall<Member>(`/members/${memberId}/profile`, {
+    method: 'PUT',
+    body: JSON.stringify(profileData),
+  });
+}
+
+// 비밀번호 변경
+export async function changePassword(memberId: number, passwordData: PasswordChangeRequest): Promise<ApiResponse<null>> {
+  return apiCall<null>(`/members/${memberId}/password`, {
+    method: 'PUT',
+    body: JSON.stringify(passwordData),
+  });
+}
+
+// 사용자가 작성한 시 목록 조회
+export async function getMemberPoems(memberId: number): Promise<ApiResponse<Poem[]>> {
+  return apiCall<Poem[]>(`/members/${memberId}/poems`, {
+    method: 'GET',
+  });
+}
+
+// 사용자가 작성한 시 목록 조회 API (페이지네이션)
+export async function getMemberPoemsWithPagination(
+  memberId: number, 
+  page: number = 0, 
+  size: number = 10, 
+  sort: string = 'createdAt', 
+  direction: string = 'desc'
+): Promise<ApiResponse<PageResponse<Poem>>> {
+  return apiCall<PageResponse<Poem>>(`/members/${memberId}/poems/page?page=${page}&size=${size}&sort=${sort}&direction=${direction}`, {
+    method: 'GET',
+  });
+}
+
+// 사용자 통계 정보 조회
+export async function getMemberStats(memberId: number): Promise<ApiResponse<MemberStats>> {
+  return apiCall<MemberStats>(`/members/${memberId}/stats`, {
+    method: 'GET',
+  });
+}
+
+// 사용자 프로필 조회
+export async function getMemberProfile(memberId: number): Promise<ApiResponse<Member>> {
+  return apiCall<Member>(`/members/${memberId}`, {
     method: 'GET',
   });
 } 

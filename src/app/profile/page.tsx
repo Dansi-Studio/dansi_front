@@ -3,29 +3,35 @@
 import { useState, useEffect } from 'react'
 import BottomNavigation from '../components/BottomNavigation'
 import './profile.css'
+import { 
+  getMemberProfile, 
+  getMemberStats, 
+  getMemberPoemsWithPagination, 
+  updateProfile, 
+  changePassword, 
+  logoutAllDevices, 
+  logout, 
+  checkAutoLogin,
+  type Member, 
+  type MemberStats, 
+  type Poem
+} from '../../utils/api'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
-// 예시 데이터
-const userData = {
-  nickname: '감성작가',
-  bio: '일상의 작은 순간들을\n글로 담아내는 것을 좋아합니다.',
-  profileImage: '/default-profile.svg',
-  joinDate: '2024.01.15',
-  email: 'writer@dansi.com',
-  totalWrites: 47,
-  totalLikes: 324,
-  totalViews: 1250,
-  badges: [
-    { id: 1, name: '준비 중이에요', description: '', icon: '✨', earned: true },
-    // { id: 2, name: '꾸준함', description: '7일 연속 글 작성', icon: '🔥', earned: true },
-    // { id: 3, name: '인기 작가', description: '100개 좋아요 달성', icon: '❤️', earned: true },
-    // { id: 4, name: '베스트셀러', description: '1000회 조회수 달성', icon: '👑', earned: false },
-  ],
-  recentPosts: [
-    { id: 1, title: '겨울 바람의 속삭임', date: '2024.03.15', likes: 23, keyword: '바람' },
-    { id: 2, title: '따뜻한 커피 한 잔', date: '2024.03.14', likes: 18, keyword: '온기' },
-    { id: 3, title: '별이 빛나는 밤에', date: '2024.03.13', likes: 31, keyword: '별빛' },
-  ]
+// 배지 타입 정의
+interface Badge {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  earned: boolean;
 }
+
+// 예시 배지 데이터
+const badges: Badge[] = [
+  { id: 1, name: '준비 중이에요', description: '', icon: '✨', earned: true },
+]
 
 // 귀여운 동물 컨셉 프로필 이미지 옵션들
 const profileImageOptions = [
@@ -36,138 +42,39 @@ const profileImageOptions = [
   { id: 5, name: '토끼', type: 'rabbit', color: '#E8E0D0' },
 ]
 
-// SVG 프로필 컴포넌트들 - 심플하고 일관된 베이지 톤 디자인
-const AnimalSVG = ({ type, size = 48 }: { type: string; size?: number }) => {
-  const strokeColor = '#735030'
-  const fillColor = '#FFFEF7'
-  const strokeWidth = '2.5'
-  const innerStrokeColor = '#A68B6B'
-  
-  switch (type) {
-    case 'person':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          {/* 사람 머리 */}
-          <circle cx="50" cy="35" r="18" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 사람 몸 */}
-          <path d="M25 90 Q25 65 35 60 Q50 55 65 60 Q75 65 75 90 Z" 
-                fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round"/>
-          {/* 얼굴 디테일 */}
-          <circle cx="45" cy="32" r="1.5" fill={strokeColor}/>
-          <circle cx="55" cy="32" r="1.5" fill={strokeColor}/>
-          <path d="M46 40 Q50 42 54 40" stroke={strokeColor} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        </svg>
-      )
-    case 'cat':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          {/* 고양이 얼굴 */}
-          <circle cx="50" cy="50" r="25" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 고양이 귀 */}
-          <path d="M32 32 L40 15 L48 32" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth} 
-                strokeLinejoin="round" strokeLinecap="round"/>
-          <path d="M52 32 L60 15 L68 32" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth} 
-                strokeLinejoin="round" strokeLinecap="round"/>
-          {/* 귀 안쪽 */}
-          <line x1="36" y1="27" x2="40" y2="20" stroke={innerStrokeColor} strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="64" y1="27" x2="60" y2="20" stroke={innerStrokeColor} strokeWidth="1.5" strokeLinecap="round"/>
-          {/* 눈 */}
-          <circle cx="42" cy="45" r="2" fill={strokeColor}/>
-          <circle cx="58" cy="45" r="2" fill={strokeColor}/>
-          {/* 코 */}
-          <path d="M48 52 L52 52 L50 55" fill={innerStrokeColor} strokeLinejoin="round"/>
-          {/* 입 */}
-          <path d="M50 55 Q46 60 43 58" stroke={strokeColor} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          <path d="M50 55 Q54 60 57 58" stroke={strokeColor} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          {/* 수염 */}
-          <line x1="30" y1="48" x2="38" y2="50" stroke={strokeColor} strokeWidth="1.2" strokeLinecap="round"/>
-          <line x1="30" y1="54" x2="38" y2="54" stroke={strokeColor} strokeWidth="1.2" strokeLinecap="round"/>
-          <line x1="62" y1="50" x2="70" y2="48" stroke={strokeColor} strokeWidth="1.2" strokeLinecap="round"/>
-          <line x1="62" y1="54" x2="70" y2="54" stroke={strokeColor} strokeWidth="1.2" strokeLinecap="round"/>
-        </svg>
-      )
-    case 'dog':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          {/* 강아지 얼굴 */}
-          <circle cx="50" cy="52" r="24" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 강아지 귀 */}
-          <ellipse cx="36" cy="35" rx="6" ry="15" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          <ellipse cx="64" cy="35" rx="6" ry="15" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 귀 안쪽 */}
-          <ellipse cx="36" cy="35" rx="3" ry="10" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          <ellipse cx="64" cy="35" rx="3" ry="10" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          {/* 눈 */}
-          <circle cx="43" cy="47" r="2.5" fill={strokeColor}/>
-          <circle cx="57" cy="47" r="2.5" fill={strokeColor}/>
-          {/* 코 */}
-          <circle cx="50" cy="57" r="2" fill={strokeColor}/>
-          {/* 입 */}
-          <path d="M50 60 Q45 65 41 63" stroke={strokeColor} strokeWidth="2" fill="none" strokeLinecap="round"/>
-          <path d="M50 60 Q55 65 59 63" stroke={strokeColor} strokeWidth="2" fill="none" strokeLinecap="round"/>
-          {/* 혀 */}
-          <ellipse cx="50" cy="68" rx="3" ry="2" fill={innerStrokeColor}/>
-        </svg>
-      )
-    case 'hamster':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          {/* 햄스터 몸통 */}
-          <circle cx="50" cy="55" r="26" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 햄스터 귀 */}
-          <circle cx="42" cy="35" r="5" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          <circle cx="58" cy="35" r="5" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 귀 안쪽 */}
-          <circle cx="42" cy="35" r="2.5" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          <circle cx="58" cy="35" r="2.5" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          {/* 눈 */}
-          <circle cx="44" cy="48" r="3" fill={strokeColor}/>
-          <circle cx="56" cy="48" r="3" fill={strokeColor}/>
-          {/* 코 */}
-          <circle cx="50" cy="55" r="1" fill={innerStrokeColor}/>
-          {/* 입 */}
-          <path d="M50 57 Q47 60 45 58" stroke={strokeColor} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M50 57 Q53 60 55 58" stroke={strokeColor} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          {/* 볼살 */}
-          <circle cx="30" cy="52" r="5" fill={fillColor} stroke={strokeColor} strokeWidth="2"/>
-          <circle cx="70" cy="52" r="5" fill={fillColor} stroke={strokeColor} strokeWidth="2"/>
-        </svg>
-      )
-    case 'rabbit':
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          {/* 토끼 얼굴 */}
-          <circle cx="50" cy="55" r="22" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 토끼 긴 귀 */}
-          <ellipse cx="44" cy="25" rx="4" ry="18" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          <ellipse cx="56" cy="25" rx="4" ry="18" fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}/>
-          {/* 귀 안쪽 */}
-          <ellipse cx="44" cy="25" rx="2" ry="12" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          <ellipse cx="56" cy="25" rx="2" ry="12" fill="none" stroke={innerStrokeColor} strokeWidth="1.5"/>
-          {/* 눈 */}
-          <circle cx="45" cy="50" r="2" fill={strokeColor}/>
-          <circle cx="55" cy="50" r="2" fill={strokeColor}/>
-          {/* 코 */}
-          <path d="M48 58 L52 58 L50 61" fill={innerStrokeColor} strokeLinejoin="round"/>
-          {/* 입 */}
-          <path d="M50 61 Q46 65 44 63" stroke={strokeColor} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M50 61 Q54 65 56 63" stroke={strokeColor} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          {/* 앞니 */}
-          <rect x="49" y="64" width="1" height="2.5" fill={fillColor} stroke={strokeColor} strokeWidth="0.8"/>
-          <rect x="50" y="64" width="1" height="2.5" fill={fillColor} stroke={strokeColor} strokeWidth="0.8"/>
-        </svg>
-      )
-    default:
-      return <div>?</div>
-  }
+// 프로필 이미지 컴포넌트 - SVG 파일을 경로로 로드
+const ProfileImage = ({ type, size = 100 }: { type: string; size?: number }) => {
+  return (
+    <Image
+      src={`/profile-images/${type}.svg`}
+      alt={`${type} profile`}
+      width={size}
+      height={size}
+      className="profile-svg"
+    />
+  )
 }
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('setting')
   const [isLoaded, setIsLoaded] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [editedNickname, setEditedNickname] = useState(userData.nickname)
-  const [editedBio, setEditedBio] = useState(userData.bio)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  
+  // 사용자 데이터 상태
+  const [userData, setUserData] = useState<Member | null>(null)
+  const [userStats, setUserStats] = useState<MemberStats | null>(null)
+  const [userPoems, setUserPoems] = useState<Poem[]>([])
+  
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [isLoadingPoems, setIsLoadingPoems] = useState(false)
+  const [pageSize] = useState(10) // 페이지당 시 개수
+  
+  // 편집 상태
+  const [editedName, setEditedName] = useState('')
+  const [editedBio, setEditedBio] = useState('')
   
   // 비밀번호 변경 모달 상태
   const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] = useState(false)
@@ -181,12 +88,143 @@ export default function ProfilePage() {
   const [isProfileImageModalOpen, setIsProfileImageModalOpen] = useState(false)
   const [selectedProfileImage, setSelectedProfileImage] = useState('person') // 기본값을 'person'으로 설정
 
-  useEffect(() => {
-    setIsLoaded(true)
-  }, [])
+  const router = useRouter()
 
-  const handleLogout = () => {
-    console.log('로그아웃')
+  // 사용자 시 목록 로드 (페이지네이션)
+  const loadUserPoems = async (page: number = 0) => {
+    if (!userData) return
+    
+    setIsLoadingPoems(true)
+    try {
+      const response = await getMemberPoemsWithPagination(userData.memberId, page, pageSize)
+      
+      if (response.success && response.data) {
+        setUserPoems(response.data.content)
+        setTotalPages(response.data.totalPages)
+        setCurrentPage(response.data.number)
+      }
+    } catch (error) {
+      console.error('사용자 시 목록 로드 오류:', error)
+    } finally {
+      setIsLoadingPoems(false)
+    }
+  }
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 0 && newPage < totalPages && newPage !== currentPage) {
+      loadUserPoems(newPage)
+    }
+  }
+
+  // 사용자 데이터 로드
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        setIsCheckingAuth(true)
+        
+        console.log('프로필 페이지: 인증 확인 시작')
+        
+        // 1. checkAutoLogin으로 토큰과 사용자 정보를 한 번에 검증
+        const userData = await checkAutoLogin()
+        
+        console.log('프로필 페이지: checkAutoLogin 결과:', userData)
+        
+        if (!userData || !userData.member) {
+          console.log('프로필 페이지: 사용자 데이터 없음, 로그인 페이지로 리디렉트')
+          // 토큰이 유효하지 않거나 사용자 정보가 없으면 로그인 페이지로 리디렉트
+          router.push('/login?redirect=profile')
+          return
+        }
+
+        const memberId = userData.member.memberId
+        console.log('프로필 페이지: 멤버 ID:', memberId)
+        
+        if (!memberId) {
+          console.log('프로필 페이지: 멤버 ID 없음, 로그인 페이지로 리디렉트')
+          // memberId가 없으면 로그인 페이지로 리디렉트
+          router.push('/login?redirect=profile')
+          return
+        }
+
+        console.log('프로필 페이지: API 호출 시작')
+        // 2. 사용자 정보 로드 (API 호출)
+        const [profileResponse, statsResponse] = await Promise.all([
+          getMemberProfile(memberId),
+          getMemberStats(memberId)
+        ])
+
+        console.log('프로필 페이지: 프로필 응답:', profileResponse)
+        console.log('프로필 페이지: 통계 응답:', statsResponse)
+
+        // 3. API 호출이 실패하면 로그인 페이지로 리디렉트
+        if (!profileResponse.success) {
+          console.error('프로필 정보 로드 실패:', profileResponse.message)
+          // 토큰이 유효하지 않거나 사용자 정보에 문제가 있음
+          logout() // logout 함수를 사용하여 모든 정보 정리
+          router.push('/login?redirect=profile')
+          return
+        }
+
+        console.log('프로필 페이지: 데이터 로드 성공, 상태 업데이트')
+        // 4. 성공적으로 데이터를 받았으면 상태 업데이트
+        if (profileResponse.success && profileResponse.data) {
+          setUserData(profileResponse.data)
+          setEditedName(profileResponse.data.name)
+          setEditedBio(profileResponse.data.bio || '')
+          setSelectedProfileImage(profileResponse.data.img || 'person')
+        }
+
+        if (statsResponse.success && statsResponse.data) {
+          setUserStats(statsResponse.data)
+        }
+
+        console.log('프로필 페이지: 모든 로직 완료')
+
+      } catch (error) {
+        console.error('프로필 페이지: 사용자 데이터 로드 오류:', error)
+        // 네트워크 오류 등의 경우에만 로그인 페이지로 리디렉트
+        logout() // logout 함수를 사용하여 모든 정보 정리
+        router.push('/login?redirect=profile')
+      } finally {
+        setIsCheckingAuth(false)
+        setIsLoaded(true)
+      }
+    }
+
+    loadUserData()
+  }, [router])
+
+  // 사용자 데이터가 로드된 후 시 목록 로드
+  useEffect(() => {
+    if (userData && activeTab === 'posts') {
+      loadUserPoems(0) // 첫 번째 페이지부터 로드
+    }
+  }, [userData, activeTab])
+
+  // 탭 변경 시 시 목록 로드
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab)
+    if (tab === 'posts' && userData && userPoems.length === 0) {
+      loadUserPoems(0)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logoutAllDevices()
+      router.push('/login')
+    } catch (error) {
+      console.error('로그아웃 오류:', error)
+      // 오류가 발생해도 로컬 스토리지는 정리하고 로그인 페이지로 이동
+      logout()
+      router.push('/login')
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
   }
 
   const handlePasswordChange = () => {
@@ -197,11 +235,25 @@ export default function ProfilePage() {
     setIsProfileImageModalOpen(true)
   }
 
-  const handleProfileImageSelect = (option: typeof profileImageOptions[0]) => {
-    setSelectedProfileImage(option.type)
-    console.log('프로필 이미지 변경:', option)
+  const handleProfileImageSelect = async (option: typeof profileImageOptions[0]) => {
+    if (!userData) return
+    
+    try {
+      const response = await updateProfile(userData.memberId, {
+        name: userData.name,
+        bio: userData.bio,
+        img: option.type
+      })
+      
+      if (response.success && response.data) {
+        setUserData(response.data)
+        setSelectedProfileImage(option.type)
+      }
+    } catch (error) {
+      console.error('프로필 이미지 변경 오류:', error)
+    }
+    
     setIsProfileImageModalOpen(false)
-    // 실제로는 API 호출하여 저장
   }
 
   const handleProfileImageCancel = () => {
@@ -209,6 +261,8 @@ export default function ProfilePage() {
   }
 
   const handlePasswordChangeSubmit = async () => {
+    if (!userData) return
+    
     // 비밀번호 검증
     if (!currentPassword || !newPassword || !confirmPassword) {
       setPasswordError('모든 필드를 입력해주세요.')
@@ -234,15 +288,17 @@ export default function ProfilePage() {
     setPasswordError('')
 
     try {
-      // 실제로는 API 호출
-      console.log('비밀번호 변경 요청:', { currentPassword, newPassword })
+      const response = await changePassword(userData.memberId, {
+        currentPassword,
+        newPassword
+      })
       
-      // 임시로 2초 대기 (실제 API 호출 시뮬레이션)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // 성공 시
-      alert('비밀번호가 성공적으로 변경되었습니다.')
-      handlePasswordChangeCancel()
+      if (response.success) {
+        alert('비밀번호가 성공적으로 변경되었습니다.')
+        handlePasswordChangeCancel()
+      } else {
+        setPasswordError(response.message || '비밀번호 변경에 실패했습니다.')
+      }
       
     } catch (error) {
       setPasswordError('비밀번호 변경에 실패했습니다. 기존 비밀번호를 확인해주세요.')
@@ -265,16 +321,41 @@ export default function ProfilePage() {
     setIsEditModalOpen(true)
   }
 
-  const handleSaveProfile = () => {
-    console.log('프로필 저장:', { nickname: editedNickname, bio: editedBio })
-    // 실제로는 API 호출하여 저장
-    setIsEditModalOpen(false)
+  const handleSaveProfile = async () => {
+    if (!userData) return
+    
+    try {
+      const response = await updateProfile(userData.memberId, {
+        name: editedName,
+        bio: editedBio,
+        img: userData.img
+      })
+      
+      if (response.success && response.data) {
+        setUserData(response.data)
+        setIsEditModalOpen(false)
+      }
+    } catch (error) {
+      console.error('프로필 저장 오류:', error)
+    }
   }
 
   const handleCancelEdit = () => {
-    setEditedNickname(userData.nickname)
-    setEditedBio(userData.bio)
+    setEditedName(userData?.name || '')
+    setEditedBio(userData?.bio || '')
     setIsEditModalOpen(false)
+  }
+
+  if (isCheckingAuth || !userData) {
+    return (
+      <div className="profile-container">
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          <p>프로필 정보를 불러오는 중...</p>
+        </div>
+        <BottomNavigation />
+      </div>
+    )
   }
 
   return (
@@ -294,14 +375,14 @@ export default function ProfilePage() {
           <div className="profile-image-container">
             <div className="profile-image-frame" onClick={handleProfileImageClick}>
               <div className="profile-svg-container">
-                <AnimalSVG type={selectedProfileImage} size={100} />
+                <ProfileImage type={selectedProfileImage} size={100} />
               </div>
             </div>
           </div>
           
           <div className="profile-info">
             <div className="profile-nickname-container">
-              <h1 className="profile-nickname">{userData.nickname}</h1>
+              <h1 className="profile-nickname">{userData.name}</h1>
               <button className="edit-icon-btn" onClick={handleEditProfile} title="프로필 편집">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M12 20h9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -310,7 +391,9 @@ export default function ProfilePage() {
               </button>
             </div>
             <div className="profile-bio-container">
-              <p className="profile-bio">{userData.bio}</p>
+              <p className="profile-bio">
+                {userData.bio && userData.bio.trim() ? userData.bio : '한줄 소개 작성해주세요!'}
+              </p>
             </div>           
           </div> 
         </div>
@@ -319,17 +402,17 @@ export default function ProfilePage() {
         <div className={`stats-grid ${isLoaded ? 'loaded' : ''}`}>
           <div className="stat-card">
             <div className="stat-icon">📝</div>
-            <div className="stat-number">{userData.totalWrites}</div>
+            <div className="stat-number">{userStats?.totalWrites || 0}</div>
             <div className="stat-label">작성한 글</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">❤️</div>
-            <div className="stat-number">{userData.totalLikes}</div>
+            <div className="stat-number">{userStats?.totalLikes || 0}</div>
             <div className="stat-label">받은 좋아요</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">👀</div>
-            <div className="stat-number">{userData.totalViews}</div>
+            <div className="stat-number">{userStats?.totalViews || 0}</div>
             <div className="stat-label">총 조회수</div>
           </div>
         </div>
@@ -338,19 +421,19 @@ export default function ProfilePage() {
         <div className="tab-navigation">
           <button 
             className={`tab-button ${activeTab === 'setting' ? 'active' : ''}`}
-            onClick={() => setActiveTab('setting')}
+            onClick={() => handleTabChange('setting')}
           >
             설정
           </button>
           <button 
             className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('posts')}
+            onClick={() => handleTabChange('posts')}
           >
             최근 글
           </button>
           <button 
             className={`tab-button ${activeTab === 'badges' ? 'active' : ''}`}
-            onClick={() => setActiveTab('badges')}
+            onClick={() => handleTabChange('badges')}
           >
             배지
           </button>
@@ -371,7 +454,7 @@ export default function ProfilePage() {
                 <div className="setting-item">
                   <div className="setting-main">
                     <div className="setting-title">함께한 날</div>
-                    <div className="setting-value">{userData.joinDate}부터</div>
+                    <div className="setting-value">{userStats?.joinDate ? formatDate(userStats.joinDate) : ''}부터</div>
                   </div>
                 </div>
 
@@ -388,28 +471,13 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-              
-              {/* <div className="quick-actions">
-                <button className="action-button">
-                  <span className="action-icon">⚙️</span>
-                  <span>설정</span>
-                </button>
-                <button className="action-button">
-                  <span className="action-icon">📊</span>
-                  <span>통계</span>
-                </button>
-                <button className="action-button">
-                  <span className="action-icon">🎨</span>
-                  <span>테마</span>
-                </button>
-              </div> */}
             </div>
           )}
 
           {activeTab === 'badges' && (
             <div className="badges-section">
               <div className="badges-grid">
-                {userData.badges.map(badge => (
+                {badges.map(badge => (
                   <div 
                     key={badge.id} 
                     className={`badge-card ${badge.earned ? 'earned' : 'locked'}`}
@@ -425,18 +493,54 @@ export default function ProfilePage() {
 
           {activeTab === 'posts' && (
             <div className="posts-section">
-              {userData.recentPosts.map(post => (
-                <div key={post.id} className="post-card">
-                  <div className="post-keyword">{post.keyword}</div>
-                  <div className="post-content">
-                    <h3 className="post-title">{post.title}</h3>
-                    <div className="post-meta">
-                      <span className="post-date">{post.date}</span>
-                      <span className="post-likes">❤️ {post.likes}</span>
+              {isLoadingPoems && (
+                <div className="loading-message">시 목록을 불러오는 중...</div>
+              )}
+              
+              {!isLoadingPoems && (
+                <>
+                  {userPoems.map(poem => (
+                    <div key={poem.poemId} className="post-card">
+                      <div className="post-keyword">{poem.keyword}</div>
+                      <div className="post-content">
+                        <h3 className="post-title">{poem.title}</h3>
+                        <div className="post-meta">
+                          <span className="post-date">{formatDate(poem.createdAt)}</span>
+                          <span className="post-likes">❤️ {poem.likeCount}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
+                  {userPoems.length === 0 && (
+                    <div className="empty-message">아직 작성한 글이 없습니다.</div>
+                  )}
+                  
+                  {/* 페이지네이션 */}
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 0}
+                      >
+                        이전
+                      </button>
+                      
+                      <div className="pagination-info">
+                        {currentPage + 1} / {totalPages} 페이지
+                      </div>
+                      
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages - 1}
+                      >
+                        다음
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -464,8 +568,8 @@ export default function ProfilePage() {
                 <input
                   id="nickname"
                   type="text"
-                  value={editedNickname}
-                  onChange={(e) => setEditedNickname(e.target.value)}
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
                   className="modal-input"
                 />
               </div>
@@ -478,6 +582,7 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedBio(e.target.value)}
                   className="modal-textarea"
                   rows={3}
+                  placeholder="한줄 소개를 작성해주세요!"
                 />
               </div>
             </div>
@@ -549,14 +654,14 @@ export default function ProfilePage() {
               )}
             </div>
             
-                         <div className="modal-footer">
-               <button className="modal-cancel-btn" onClick={handlePasswordChangeCancel} disabled={isChangingPassword}>
-                 취소
-               </button>
-               <button className="modal-save-btn" onClick={handlePasswordChangeSubmit} disabled={isChangingPassword}>
-                 {isChangingPassword ? '변경 중...' : '저장'}
-               </button>
-             </div>
+            <div className="modal-footer">
+              <button className="modal-cancel-btn" onClick={handlePasswordChangeCancel} disabled={isChangingPassword}>
+                취소
+              </button>
+              <button className="modal-save-btn" onClick={handlePasswordChangeSubmit} disabled={isChangingPassword}>
+                {isChangingPassword ? '변경 중...' : '저장'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -586,7 +691,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: option.color }}
                     >
                       <div className="profile-card-emoji">
-                        <AnimalSVG type={option.type} size={48} />
+                        <ProfileImage type={option.type} size={48} />
                       </div>
                       <div className="profile-card-name">{option.name}</div>
                       {selectedProfileImage === option.type && (
