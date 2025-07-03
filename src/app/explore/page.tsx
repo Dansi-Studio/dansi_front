@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import BottomNavigation from '../components/BottomNavigation'
@@ -19,7 +19,7 @@ import {
 
 type SortType = 'latest' | 'popular'
 
-export default function ExplorePage() {
+function ExplorePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [sortType, setSortType] = useState<SortType>('latest')
@@ -490,5 +490,24 @@ export default function ExplorePage() {
 
       <BottomNavigation />
     </div>
+  )
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={
+      <div className="explore-container">
+        <div className="explore-header">
+          <h1 className="explore-title">둘러보기</h1>
+        </div>
+        <div className="explore-loading">
+          <div className="loading-spinner"></div>
+          <p>시 목록을 불러오는 중...</p>
+        </div>
+        <BottomNavigation />
+      </div>
+    }>
+      <ExplorePageContent />
+    </Suspense>
   )
 }
