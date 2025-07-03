@@ -546,8 +546,8 @@ export async function getPoemsByMember(memberId: number): Promise<ApiResponse<Po
 }
 
 // 시 수정
-export async function updatePoem(poemId: number, poemData: PoemUpdateRequest): Promise<ApiResponse<Poem>> {
-  return apiCall<Poem>(`/poems/${poemId}`, {
+export async function updatePoem(poemId: number, memberId: number, poemData: PoemUpdateRequest): Promise<ApiResponse<Poem>> {
+  return apiCall<Poem>(`/poems/${poemId}?memberId=${memberId}`, {
     method: 'PUT',
     body: JSON.stringify(poemData),
   });
@@ -558,4 +558,110 @@ export async function deletePoem(poemId: number, memberId: number): Promise<ApiR
   return apiCall<null>(`/poems/${poemId}?memberId=${memberId}`, {
     method: 'DELETE',
   });
+}
+
+// ============== EXPLORE 페이지 관련 API ==============
+
+// 댓글 타입 정의
+export interface Comment {
+  commentId: number;
+  content: string;
+  createdAt: string;
+  poem: {
+    poemId: number;
+    title: string;
+  };
+  member: {
+    memberId: number;
+    name: string;
+    img?: string;
+  };
+}
+
+// 시 요약 타입 정의 (explore 페이지용)
+export interface PoemSummary {
+  poemId: number;
+  title: string;
+  keyword: string;
+  content: string;
+  createdAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+  member?: {
+    memberId: number;
+    name: string;
+    img?: string;
+  };
+}
+
+// 키워드별 시 목록 조회 (PoemController의 /list 엔드포인트)
+export async function getPoemsListByKeyword(keyword: string): Promise<ApiResponse<PoemSummary[]>> {
+  const url = `/poems/list?keyword=${encodeURIComponent(keyword)}`;
+  return apiCall<PoemSummary[]>(url);
+}
+
+// 시 상세 조회 (조회수 자동 증가)
+export async function getPoemDetail(poemId: number): Promise<ApiResponse<Poem>> {
+  return apiCall<Poem>(`/poems/${poemId}`);
+}
+
+// 좋아요 토글
+export async function togglePoemLike(poemId: number, memberId: number): Promise<ApiResponse<{isLiked: boolean}>> {
+  return apiCall<{isLiked: boolean}>('/likes/toggle', {
+    method: 'POST',
+    body: JSON.stringify({ 
+      poem: { poemId }, 
+      member: { memberId }
+    })
+  });
+}
+
+// 좋아요 상태 확인
+export async function checkLikeStatus(poemId: number, memberId: number): Promise<ApiResponse<{isLiked: boolean}>> {
+  const url = `/likes/check?poemId=${poemId}&memberId=${memberId}`;
+  return apiCall<{isLiked: boolean}>(url);
+}
+
+// 좋아요 개수 조회
+export async function getLikeCount(poemId: number): Promise<ApiResponse<{count: number}>> {
+  return apiCall<{count: number}>(`/likes/poem/${poemId}/count`);
+}
+
+// 댓글 목록 조회
+export async function getCommentsByPoem(poemId: number): Promise<ApiResponse<Comment[]>> {
+  return apiCall<Comment[]>(`/comments/poem/${poemId}`);
+}
+
+// 댓글 개수 조회
+export async function getCommentsCount(poemId: number): Promise<ApiResponse<{count: number}>> {
+  return apiCall<{count: number}>(`/comments/poem/${poemId}/count`);
+}
+
+// 댓글 작성
+export async function createComment(poemId: number, memberId: number, content: string): Promise<ApiResponse<Comment>> {
+  return apiCall<Comment>('/comments', {
+    method: 'POST',
+    body: JSON.stringify({
+      poem: { poemId },
+      member: { memberId },
+      content
+    })
+  });
+}
+
+// 댓글 삭제
+export async function deleteComment(commentId: number, memberId: number): Promise<ApiResponse<null>> {
+  return apiCall<null>(`/comments/${commentId}?memberId=${memberId}`, {
+    method: 'DELETE',
+  });
+}
+
+// 시 수정 페이지용 인터페이스
+export interface PoemEditData {
+  poemId: number;
+  keyword: string;
+  title: string;
+  content: string;
 } 

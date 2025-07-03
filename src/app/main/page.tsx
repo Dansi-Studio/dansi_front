@@ -43,13 +43,13 @@ export default function MainPage() {
         if (inspirationKeywordsResponse.success && inspirationKeywordsResponse.data) {
           const inspirationKeywordStrings = inspirationKeywordsResponse.data.map(k => k.keyword)
           setInspirationKeywords(inspirationKeywordStrings)
-          
-          // 키워드 카드 크기들을 클라이언트에서만 생성 - 핀터레스트 스타일
+    
+    // 키워드 카드 크기들을 클라이언트에서만 생성 - 핀터레스트 스타일
           const sizes = inspirationKeywordStrings.map(() => {
-            const sizeOptions = ['small', 'small', 'medium', 'large', 'large'] // large를 더 많이 추가하여 공간 채우기
-            return sizeOptions[Math.floor(Math.random() * sizeOptions.length)]
-          })
-          setKeywordSizes(sizes)
+      const sizeOptions = ['small', 'small', 'medium', 'large', 'large'] // large를 더 많이 추가하여 공간 채우기
+      return sizeOptions[Math.floor(Math.random() * sizeOptions.length)]
+    })
+    setKeywordSizes(sizes)
         }
         
       } catch (error) {

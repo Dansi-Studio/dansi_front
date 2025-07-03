@@ -67,7 +67,7 @@ function LoginPageContent() {
         if (redirectTo === 'profile') {
           router.push('/profile')
         } else {
-          router.push('/main')
+    router.push('/main')
         }
       } else {
         setError(response.message || '로그인에 실패했습니다.')
@@ -136,7 +136,7 @@ function LoginPageContent() {
               disabled={isLoading}
             />
           </div>
-
+          
           <div className="input-group">
             <input
               type="password"
@@ -156,7 +156,7 @@ function LoginPageContent() {
             </div>
           )}
 
-          <button 
+          <button
             type="button"
             onClick={handleForgotPassword}
             className="forgot-password-link"
@@ -174,8 +174,8 @@ function LoginPageContent() {
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
             
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={handleSignup}
               className="signup-button"
               disabled={isLoading}

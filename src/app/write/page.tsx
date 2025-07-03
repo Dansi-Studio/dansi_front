@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createPoem, userStorage, type PoemCreateRequest } from '../../utils/api'
+import { createPoem, updatePoem, userStorage, type PoemCreateRequest, type PoemUpdateRequest } from '../../utils/api'
 import './write.css'
 
 function WritePageContent() {
@@ -19,6 +19,8 @@ function WritePageContent() {
   const [isSaving, setIsSaving] = useState(false)
   const [tempKeyword, setTempKeyword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editPoemId, setEditPoemId] = useState<number | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [currentUser, setCurrentUser] = useState<any>(null)
 
@@ -34,6 +36,30 @@ function WritePageContent() {
     setCurrentUser(user)
     setIsLoggedIn(true)
 
+    // 수정 모드 확인
+    const editParam = searchParams.get('edit')
+    const poemIdParam = searchParams.get('poemId')
+    
+    if (editParam === 'true' && poemIdParam) {
+      setIsEditMode(true)
+      setEditPoemId(parseInt(poemIdParam))
+      
+      // 수정할 시 정보 불러오기
+      const keywordParam = searchParams.get('keyword')
+      const titleParam = searchParams.get('title')
+      const contentParam = searchParams.get('content')
+      
+      if (keywordParam) {
+        setKeyword(keywordParam)
+        setTempKeyword(keywordParam)
+      }
+      if (titleParam) setTitle(titleParam)
+      if (contentParam) {
+        setContent(contentParam)
+        setCharCount(contentParam.length)
+      }
+    } else {
+      // 새 글 작성 모드
     const keywordParam = searchParams.get('keyword')
     if (keywordParam) {
       setKeyword(keywordParam)
@@ -41,6 +67,7 @@ function WritePageContent() {
     } else {
       setKeyword('영감')
       setTempKeyword('영감')
+      }
     }
 
     const timer = setTimeout(() => {
@@ -78,28 +105,51 @@ function WritePageContent() {
     setIsSaving(true)
     
     try {
-      const poemData: PoemCreateRequest = {
-        keyword: keyword.trim(),
-        title: title.trim(),
-        content: content.trim(),
-        memberId: currentUser.memberId
-      }
+      if (isEditMode && editPoemId) {
+        // 수정 모드
+        const poemUpdateData: PoemUpdateRequest = {
+          keyword: keyword.trim(),
+          title: title.trim(),
+          content: content.trim(),
+        }
 
-      console.log('시 작성 요청:', poemData)
+        console.log('시 수정 요청:', poemUpdateData)
 
-      const response = await createPoem(poemData)
-      
-      if (response.success && response.data) {
-        console.log('시 작성 성공:', response.data)
-        alert('시가 성공적으로 발행되었습니다!')
-      router.push('/main')
+        const response = await updatePoem(editPoemId, currentUser.memberId, poemUpdateData)
+        
+        if (response.success && response.data) {
+          console.log('시 수정 성공:', response.data)
+          alert('시가 성공적으로 수정되었습니다!')
+          router.push(`/explore/${editPoemId}`)
+        } else {
+          console.error('시 수정 실패:', response.message)
+          alert(`시 수정에 실패했습니다: ${response.message || '알 수 없는 오류'}`)
+        }
       } else {
-        console.error('시 작성 실패:', response.message)
-        alert(`시 작성에 실패했습니다: ${response.message || '알 수 없는 오류'}`)
+        // 새 글 작성 모드
+        const poemData: PoemCreateRequest = {
+          keyword: keyword.trim(),
+          title: title.trim(),
+          content: content.trim(),
+          memberId: currentUser.memberId
+        }
+
+        console.log('시 작성 요청:', poemData)
+
+        const response = await createPoem(poemData)
+        
+        if (response.success && response.data) {
+          console.log('시 작성 성공:', response.data)
+          alert('시가 성공적으로 발행되었습니다!')
+      router.push('/main')
+        } else {
+          console.error('시 작성 실패:', response.message)
+          alert(`시 작성에 실패했습니다: ${response.message || '알 수 없는 오류'}`)
+        }
       }
     } catch (error) {
-      console.error('시 작성 중 오류:', error)
-      alert('시 작성 중 오류가 발생했습니다. 다시 시도해주세요.')
+      console.error('시 작성/수정 중 오류:', error)
+      alert('시 작성/수정 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsSaving(false)
     }
@@ -144,7 +194,7 @@ function WritePageContent() {
             onClick={handleSave}
             disabled={isSaving || !content.trim() || !title.trim()}
           >
-            {isSaving ? '발행 중...' : '발행'}
+            {isSaving ? (isEditMode ? '수정 중...' : '발행 중...') : (isEditMode ? '수정' : '발행')}
           </button>
         </div>
       </div>

@@ -31,7 +31,7 @@ interface Badge {
 // 예시 배지 데이터
 const badges: Badge[] = [
   { id: 1, name: '준비 중이에요', description: '', icon: '✨', earned: true },
-]
+  ]
 
 // 귀여운 동물 컨셉 프로필 이미지 옵션들
 const profileImageOptions = [
@@ -44,7 +44,7 @@ const profileImageOptions = [
 
 // 프로필 이미지 컴포넌트 - SVG 파일을 경로로 로드
 const ProfileImage = ({ type, size = 100 }: { type: string; size?: number }) => {
-  return (
+      return (
     <Image
       src={`/profile-images/${type}.svg`}
       alt={`${type} profile`}
@@ -188,7 +188,7 @@ export default function ProfilePage() {
         router.push('/login?redirect=profile')
       } finally {
         setIsCheckingAuth(false)
-        setIsLoaded(true)
+    setIsLoaded(true)
       }
     }
 
@@ -247,7 +247,7 @@ export default function ProfilePage() {
       
       if (response.success && response.data) {
         setUserData(response.data)
-        setSelectedProfileImage(option.type)
+    setSelectedProfileImage(option.type)
       }
     } catch (error) {
       console.error('프로필 이미지 변경 오류:', error)
@@ -294,8 +294,8 @@ export default function ProfilePage() {
       })
       
       if (response.success) {
-        alert('비밀번호가 성공적으로 변경되었습니다.')
-        handlePasswordChangeCancel()
+      alert('비밀번호가 성공적으로 변경되었습니다.')
+      handlePasswordChangeCancel()
       } else {
         setPasswordError(response.message || '비밀번호 변경에 실패했습니다.')
       }
@@ -333,7 +333,7 @@ export default function ProfilePage() {
       
       if (response.success && response.data) {
         setUserData(response.data)
-        setIsEditModalOpen(false)
+    setIsEditModalOpen(false)
       }
     } catch (error) {
       console.error('프로필 저장 오류:', error)
@@ -500,17 +500,21 @@ export default function ProfilePage() {
               {!isLoadingPoems && (
                 <>
                   {userPoems.map((poem, index) => (
-                    <div key={poem?.poemId || `poem-${index}`} className="post-card">
+                    <div 
+                      key={poem?.poemId || `poem-${index}`} 
+                      className="post-card clickable"
+                      onClick={() => poem?.poemId && router.push(`/explore/${poem.poemId}`)}
+                    >
                       <div className="post-keyword">{poem?.keyword || '키워드 없음'}</div>
-                      <div className="post-content">
+                  <div className="post-content">
                         <h3 className="post-title">{poem?.title || '제목 없음'}</h3>
-                        <div className="post-meta">
+                    <div className="post-meta">
                           <span className="post-date">{poem?.createdAt ? formatDate(poem.createdAt) : '날짜 없음'}</span>
                           <span className="post-likes">❤️ {poem?.likeCount || 0}</span>
-                        </div>
-                      </div>
                     </div>
-                  ))}
+                  </div>
+                </div>
+              ))}
                   {userPoems.length === 0 && (
                     <div className="empty-message">아직 작성한 글이 없습니다.</div>
                   )}
@@ -654,14 +658,14 @@ export default function ProfilePage() {
               )}
             </div>
             
-            <div className="modal-footer">
-              <button className="modal-cancel-btn" onClick={handlePasswordChangeCancel} disabled={isChangingPassword}>
-                취소
-              </button>
-              <button className="modal-save-btn" onClick={handlePasswordChangeSubmit} disabled={isChangingPassword}>
-                {isChangingPassword ? '변경 중...' : '저장'}
-              </button>
-            </div>
+                         <div className="modal-footer">
+               <button className="modal-cancel-btn" onClick={handlePasswordChangeCancel} disabled={isChangingPassword}>
+                 취소
+               </button>
+               <button className="modal-save-btn" onClick={handlePasswordChangeSubmit} disabled={isChangingPassword}>
+                 {isChangingPassword ? '변경 중...' : '저장'}
+               </button>
+             </div>
           </div>
         </div>
       )}

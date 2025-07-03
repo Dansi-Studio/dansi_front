@@ -1,141 +1,227 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
 import BottomNavigation from '../components/BottomNavigation'
 import './explore.css'
+import { 
+  getPoems, 
+  getPoemsListByKeyword, 
+  togglePoemLike, 
+  checkLikeStatus, 
+  getLikeCount, 
+  getCommentsCount,
+  checkAutoLogin,
+  type PoemSummary,
+  type Member
+} from '../../utils/api'
 
 type SortType = 'latest' | 'popular'
 
-// 예시 게시글 데이터
-const posts = [
-  {
-    id: 1,
-    author: {
-      name: '시인의마음',
-      avatar: '/default-profile.svg'
-    },
-    keyword: '할머니',
-    title: '할머니의 손길',
-    content: '따뜻했던 할머니의 손길이 아직도 생생합니다.\n그 손으로 만져주시던 머리카락의 촉감과\n손바닥에 새겨진 세월의 흔적들이\n저에게는 가장 소중한 기억입니다.\n\n할머니, 보고 싶어요.',
-    createdAt: '2024.12.24',
-    viewCount: 256,
-    heartCount: 23,
-    commentCount: 12,
-    isLiked: false
-  },
-  {
-    id: 2,
-    author: {
-      name: '달빛작가',
-      avatar: '/default-profile.svg'
-    },
-    keyword: '별',
-    title: '밤하늘의 약속',
-    content: '어릴 적 바라보던 그 별이 오늘도 저 자리에 있습니다.\n시간이 흘러도 변하지 않는 것들이 있어\n마음이 든든해집니다.\n\n별아, 고마워.',
-    createdAt: '2024.12.23',
-    viewCount: 189,
-    heartCount: 34,
-    commentCount: 8,
-    isLiked: true
-  },
-  {
-    id: 3,
-    author: {
-      name: '감성글꾼',
-      avatar: '/default-profile.svg'
-    },
-    keyword: '바다',
-    title: '파도의 노래',
-    content: '끊임없이 밀려오는 파도처럼\n당신이 그리워집니다.\n바다가 들려주는 이야기를\n오늘도 듣고 있어요.\n\n언젠가 함께 바다를 보러 가요.',
-    createdAt: '2024.12.22',
-    viewCount: 423,
-    heartCount: 56,
-    commentCount: 19,
-    isLiked: false
-  },
-  {
-    id: 4,
-    author: {
-      name: '추억수집가',
-      avatar: '/default-profile.svg'
-    },
-    keyword: '집',
-    title: '엄마의 집',
-    content: '집에 가면 항상 똑같은 자리에\n엄마가 앉아 계십니다.\n그 모습이 변하지 않아서\n집이 더욱 집다워집니다.\n\n고마워요, 엄마.',
-    createdAt: '2024.12.21',
-    viewCount: 312,
-    heartCount: 41,
-    commentCount: 15,
-    isLiked: true
-  },
-  {
-    id: 5,
-    author: {
-      name: '봄날의꿈',
-      avatar: '/default-profile.svg'
-    },
-    keyword: '꽃',
-    title: '벚꽃이 피면',
-    content: '벚꽃이 피면 생각나는 사람이 있습니다.\n함께 걸었던 그 길에서\n웃음소리가 들려오는 것 같아요.\n\n올해도 꽃이 필까요?',
-    createdAt: '2024.12.20',
-    viewCount: 145,
-    heartCount: 28,
-    commentCount: 6,
-    isLiked: false
-  }
-]
-
 export default function ExplorePage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [sortType, setSortType] = useState<SortType>('latest')
-  const [postsData, setPostsData] = useState(posts)
+  const [postsData, setPostsData] = useState<PoemSummary[]>([])
   const [searchKeyword, setSearchKeyword] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isSearchFixed, setIsSearchFixed] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<Member | null>(null)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
 
-  // 검색 필터링
-  const filteredPosts = postsData.filter(post => {
-    if (!searchKeyword.trim()) return true
-    return post.keyword.toLowerCase().includes(searchKeyword.toLowerCase())
-  })
+  // 사용자 정보 확인
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userData = await checkAutoLogin()
+        if (userData?.member) {
+          setCurrentUser(userData.member)
+        }
+      } catch (error) {
+        console.error('사용자 정보 확인 오류:', error)
+      }
+    }
+    loadUserData()
+  }, [])
 
-  // 정렬
-  const sortedPosts = [...filteredPosts].sort((a, b) => {
-    if (sortType === 'latest') {
+  // URL 파라미터에서 키워드 확인 및 자동 검색
+  useEffect(() => {
+    const keywordParam = searchParams.get('keyword')
+    if (keywordParam) {
+      setSearchKeyword(keywordParam)
+      setIsSearchFixed(true)  // 검색창은 닫혀있지만 검색은 완료된 상태
+      // 검색 실행
+      loadPosts(0, keywordParam, sortType, false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, sortType])
+
+  // 시 목록 로드
+  const loadPosts = async (page: number = 0, keyword: string = '', sort: SortType = 'latest', isLoadMore: boolean = false) => {
+    try {
+      if (!isLoadMore) {
+        setIsLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
+
+      let response
+      if (keyword.trim()) {
+        // 키워드 검색
+        response = await getPoemsListByKeyword(keyword)
+                 if (response.success && response.data) {
+           // 키워드 검색 결과를 PoemSummary 형식으로 변환
+           const poemsWithCounts: PoemSummary[] = await Promise.all(
+             response.data.map(async (poem): Promise<PoemSummary> => {
+               const [likeResponse, commentResponse] = await Promise.all([
+                 getLikeCount(poem.poemId),
+                 getCommentsCount(poem.poemId)
+               ])
+               
+               let isLiked = false
+               if (currentUser) {
+                 const likeStatusResponse = await checkLikeStatus(poem.poemId, currentUser.memberId)
+                 isLiked = likeStatusResponse.success ? likeStatusResponse.data?.isLiked || false : false
+               }
+
+               return {
+                 ...poem,
+                 likeCount: likeResponse.success ? likeResponse.data?.count || 0 : 0,
+                 commentCount: commentResponse.success ? commentResponse.data?.count || 0 : 0,
+                 isLiked
+               } as PoemSummary
+             })
+           )
+          
+          // 정렬 적용
+          const sortedPoems = [...poemsWithCounts].sort((a, b) => {
+            if (sort === 'latest') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     } else {
-      return b.heartCount - a.heartCount
-    }
-  })
+              return b.likeCount - a.likeCount
+            }
+          })
+          
+          setPostsData(sortedPoems)
+          setHasMore(false) // 키워드 검색은 페이징 없음
+        }
+      } else {
+        // 전체 시 목록 조회
+        response = await getPoems(page, 10, sort)
+        if (response.success && response.data) {
+          const poems = response.data.content
+          
+                     // 각 시에 대해 좋아요 개수, 댓글 개수, 좋아요 상태 조회
+           const poemsWithCounts: PoemSummary[] = await Promise.all(
+             poems.map(async (poem): Promise<PoemSummary> => {
+               const [likeResponse, commentResponse] = await Promise.all([
+                 getLikeCount(poem.poemId),
+                 getCommentsCount(poem.poemId)
+               ])
+               
+               let isLiked = false
+               if (currentUser) {
+                 const likeStatusResponse = await checkLikeStatus(poem.poemId, currentUser.memberId)
+                 isLiked = likeStatusResponse.success ? likeStatusResponse.data?.isLiked || false : false
+               }
 
-  const handleLike = (postId: number) => {
+               return {
+                 ...poem,
+                 likeCount: likeResponse.success ? likeResponse.data?.count || 0 : 0,
+                 commentCount: commentResponse.success ? commentResponse.data?.count || 0 : 0,
+                 isLiked
+               } as PoemSummary
+             })
+           )
+          
+          if (isLoadMore) {
+            setPostsData(prev => [...prev, ...poemsWithCounts])
+          } else {
+            setPostsData(poemsWithCounts)
+          }
+          
+          setHasMore(!response.data.last)
+        }
+      }
+    } catch (error) {
+      console.error('시 목록 로드 오류:', error)
+    } finally {
+      setIsLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  // 초기 로드 (키워드 파라미터가 없을 때만)
+  useEffect(() => {
+    const keywordParam = searchParams.get('keyword')
+    if (!keywordParam) {
+      loadPosts(0, searchKeyword, sortType, false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortType, currentUser, searchParams])
+
+  // 검색 실행 (수동 검색인 경우만)
+  useEffect(() => {
+    const keywordParam = searchParams.get('keyword')
+    if (isSearchFixed && searchKeyword.trim() && !keywordParam) {
+      setCurrentPage(0)
+      loadPosts(0, searchKeyword, sortType, false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearchFixed, searchKeyword, sortType, searchParams])
+
+  // 좋아요 토글
+  const handleLike = async (poemId: number) => {
+    if (!currentUser) {
+      // 로그인 필요
+      router.push('/login')
+      return
+    }
+
+    try {
+      const response = await togglePoemLike(poemId, currentUser.memberId)
+      if (response.success) {
+        // 로컬 상태 업데이트
     setPostsData(prevPosts =>
       prevPosts.map(post =>
-        post.id === postId
+            post.poemId === poemId
           ? {
               ...post,
-              isLiked: !post.isLiked,
-              heartCount: post.isLiked ? post.heartCount - 1 : post.heartCount + 1
+                  isLiked: response.data?.isLiked || false,
+                  likeCount: response.data?.isLiked 
+                    ? post.likeCount + 1 
+                    : Math.max(0, post.likeCount - 1)
             }
           : post
       )
     )
+      }
+    } catch (error) {
+      console.error('좋아요 토글 오류:', error)
+    }
   }
 
   const handlePostClick = (postId: number) => {
-    window.location.href = `/explore/${postId}`
+    router.push(`/explore/${postId}`)
   }
 
   const handleSortSelect = (type: SortType) => {
     setSortType(type)
     setIsDropdownOpen(false)
+    setCurrentPage(0)
   }
 
   const clearSearch = () => {
     setSearchKeyword('')
     setIsSearchOpen(false)
     setIsSearchFixed(false)
+    setCurrentPage(0)
+    loadPosts(0, '', sortType, false)
   }
 
   const toggleSearch = () => {
@@ -174,6 +260,41 @@ export default function ExplorePage() {
     if (isDropdownOpen) {
       setIsDropdownOpen(false)
     }
+  }
+
+  const loadMorePosts = () => {
+    if (hasMore && !loadingMore && !searchKeyword.trim()) {
+      const nextPage = currentPage + 1
+      setCurrentPage(nextPage)
+      loadPosts(nextPage, searchKeyword, sortType, true)
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
+  }
+
+  const getProfileImageSrc = (imgType?: string) => {
+    if (imgType && ['cat', 'dog', 'hamster', 'rabbit', 'person'].includes(imgType)) {
+      return `/profile-images/${imgType}.svg`
+    }
+    return '/default-profile.svg'
+  }
+
+  if (isLoading) {
+    return (
+      <div className="explore-container">
+        <div className="explore-header">
+          <h1 className="explore-title">둘러보기</h1>
+        </div>
+        <div className="explore-loading">
+          <div className="loading-spinner"></div>
+          <p>시 목록을 불러오는 중...</p>
+        </div>
+        <BottomNavigation />
+      </div>
+    )
   }
 
   return (
@@ -264,27 +385,32 @@ export default function ExplorePage() {
             </div>
           </div>
         </div>
-        {sortedPosts.length > 0 ? (
-          sortedPosts.map((post) => (
-            <div key={post.id} className="explore-post-card">
+
+        {/* 시 목록 */}
+        {postsData.length > 0 ? (
+          <>
+            {postsData.map((post) => (
+              <div key={post.poemId} className="explore-post-card">
               <div className="explore-post-header">
                 <div className="explore-author-info">
                   <Image
-                    src={post.author.avatar}
-                    alt={post.author.name}
+                      src={getProfileImageSrc(post.member?.img)}
+                      alt={post.member?.name || '작성자'}
                     width={36}
                     height={36}
                     className="explore-author-avatar"
                   />
                   <div className="explore-author-details">
-                    <span className="explore-author-name">{post.author.name}</span>
-                    <span className="explore-post-date">{post.createdAt}</span>
+                      <span className="explore-author-name">{post.member?.name || '익명'}</span>
+                      <span className="explore-post-date">{formatDate(post.createdAt)}</span>
+                    </div>
                   </div>
-                </div>
-                <span className="explore-post-keyword">오늘의 {post.keyword}</span>
+                  <span className="explore-post-keyword">
+                    {post.keyword ? `오늘의 ${post.keyword}` : '자유 주제'}
+                  </span>
               </div>
               
-              <div className="explore-post-content" onClick={() => handlePostClick(post.id)}>
+                <div className="explore-post-content" onClick={() => handlePostClick(post.poemId)}>
                 <h3 className="explore-post-title">{post.title}</h3>
                 <p className="explore-post-text">{post.content}</p>
               </div>
@@ -310,17 +436,17 @@ export default function ExplorePage() {
                   className={`explore-action-button heart ${post.isLiked ? 'liked' : ''}`}
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleLike(post.id)
+                      handleLike(post.poemId)
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={post.isLiked ? "currentColor" : "none"}>
                     <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 3C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.99866 7.05 3C5.59096 2.99866 4.19169 3.57831 3.16 4.61C2.12831 5.64169 1.54866 7.04096 1.55 8.5C1.54866 9.95904 2.12831 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.45 8.5C22.4518 7.77752 22.3095 7.06211 22.0329 6.39457C21.7563 5.72703 21.351 5.12076 20.84 4.61Z" stroke="currentColor" strokeWidth="2"/>
                   </svg>
-                  <span>{post.heartCount}</span>
+                    <span>{post.likeCount}</span>
                 </button>
                 <button
                   className="explore-action-button comment"
-                  onClick={() => handlePostClick(post.id)}
+                    onClick={() => handlePostClick(post.poemId)}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2"/>
@@ -329,11 +455,35 @@ export default function ExplorePage() {
                 </button>
               </div>
             </div>
-          ))
+            ))}
+            
+            {/* 더 보기 버튼 */}
+            {hasMore && !searchKeyword.trim() && (
+              <div className="explore-load-more">
+                <button 
+                  className="explore-load-more-btn"
+                  onClick={loadMorePosts}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? '불러오는 중...' : '더 보기'}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="explore-no-results">
-            <p>{`'${searchKeyword}' 키워드로 작성된 시가 없습니다.`}</p>
-            <p>다른 키워드로 검색해보세요.</p>
+            <p>
+              {searchKeyword.trim() 
+                ? `'${searchKeyword}' 키워드로 작성된 시가 없습니다.`
+                : '아직 작성된 시가 없습니다.'
+              }
+            </p>
+            <p>
+              {searchKeyword.trim() 
+                ? '다른 키워드로 검색해보세요.'
+                : '첫 번째 시를 작성해보세요!'
+              }
+            </p>
           </div>
         )}
       </div>

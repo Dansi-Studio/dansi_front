@@ -117,7 +117,7 @@ export default function SignupPage() {
       setEmailError('올바른 이메일 형식을 입력해주세요.')
       return
     }
-
+    
     setIsEmailChecking(true)
     setEmailError('')
 
@@ -251,8 +251,8 @@ export default function SignupPage() {
               {isLoading ? '가입 중...' : '회원가입'}
             </button>
             
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={handleCancel}
               className="cancel-button"
               disabled={isLoading}
