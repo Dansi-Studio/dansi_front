@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     description: "시와 감성을 나누는 창작 공간",
     images: '/icons/icon-192x192.png',
   },
+
 };
 
 export const viewport: Viewport = {
@@ -57,6 +58,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7311802367022546"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${sunflower.variable} antialiased font-sans`}
       >
